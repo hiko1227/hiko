@@ -44,29 +44,10 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
-        .clock { 
-            font-size: 3.2rem; 
-            font-weight: 800; 
-            color: var(--accent-blue); 
-            line-height: 1; 
-            letter-spacing: 1px;
-        }
-        
-        .date-center { 
-            text-align: center; 
-        }
-        
-        .date-main { 
-            font-size: 1.4rem; 
-            font-weight: 700; 
-        }
-        
-        .lunar-main { 
-            font-size: 1.15rem; 
-            color: var(--accent-yellow); 
-            margin-top: 6px; 
-            font-weight: 500;
-        }
+        .clock { font-size: 3.2rem; font-weight: 800; color: var(--accent-blue); line-height: 1; letter-spacing: 1px; }
+        .date-center { text-align: center; }
+        .date-main { font-size: 1.4rem; font-weight: 700; }
+        .lunar-main { font-size: 1.15rem; color: var(--accent-yellow); margin-top: 6px; font-weight: 500; }
         
         .holiday-box { 
             text-align: right; 
@@ -75,30 +56,11 @@
             padding: 12px 18px; 
             border-radius: 16px; 
         }
-        
-        .holiday-title { 
-            font-size: 0.8rem; 
-            color: var(--accent-green); 
-            font-weight: bold; 
-            text-transform: uppercase;
-        }
-        
-        .holiday-name { 
-            font-size: 1.05rem; 
-            color: #f3f4f6; 
-            margin-top: 3px; 
-            font-weight: 600;
-        }
+        .holiday-title { font-size: 0.8rem; color: var(--accent-green); font-weight: bold; text-transform: uppercase; }
+        .holiday-name { font-size: 1.05rem; color: #f3f4f6; margin-top: 3px; font-weight: 600; }
 
         /* 下方雙欄大面板 */
-        .main-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1.2fr; 
-            gap: 24px; 
-            max-width: 1200px; 
-            margin: auto; 
-        }
-        
+        .main-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; max-width: 1200px; margin: auto; }
         .panel { 
             background: var(--card-bg); 
             padding: 24px; 
@@ -108,86 +70,26 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             margin-bottom: 24px;
         }
-        
         .panel-title { 
-            font-size: 1.35rem; 
-            color: var(--accent-green); 
-            font-weight: 700; 
-            margin-bottom: 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.08); 
-            padding-bottom: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            font-size: 1.35rem; color: var(--accent-green); font-weight: 700; margin-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; 
+            display: flex; justify-content: space-between; align-items: center; 
         }
         
         /* 天氣板塊細節 */
-        .wx-temp-box { 
-            display: flex; 
-            align-items: center; 
-            gap: 16px; 
-            margin-top: 10px; 
-        }
-        
-        .wx-temp { 
-            font-size: 3rem; 
-            font-weight: 800; 
-            color: var(--accent-yellow); 
-            line-height: 1; 
-        }
-        
-        .forecast-container { 
-            margin-top: 18px; 
-            border-top: 1px solid rgba(255,255,255,0.08); 
-            padding-top: 16px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-        }
-        
-        .forecast-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: rgba(0,0,0,0.25); 
-            padding: 10px 14px; 
-            border-radius: 12px; 
-            font-size: 1rem; 
-        }
+        .wx-temp-box { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
+        .wx-temp { font-size: 3rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
+        .forecast-container { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .forecast-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 12px; font-size: 1rem; }
 
         /* 外幣匯率板塊 */
-        .fx-container { 
-            margin-top: 18px; 
-            border-top: 1px solid rgba(255,255,255,0.08); 
-            padding-top: 16px; 
-            display: flex; 
-            gap: 12px; 
-        }
-        
-        .fx-card { 
-            flex: 1; 
-            background: rgba(0,0,0,0.25); 
-            padding: 12px; 
-            border-radius: 14px; 
-            text-align: center; 
-        }
-        
+        .fx-container { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; display: flex; gap: 12px; }
+        .fx-card { flex: 1; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 14px; text-align: center; }
         .fx-title { font-size: 0.85rem; color: #9ca3af; }
         .fx-val { font-size: 1.2rem; font-weight: 700; color: var(--accent-blue); margin-top: 6px; }
 
         /* 巴士與港鐵通用行排版 */
-        .transport-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 14px 18px; 
-            margin: 10px 0; 
-            border-radius: 16px; 
-            font-weight: 700; 
-            font-size: 1.05rem; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
+        .transport-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; margin: 10px 0; border-radius: 16px; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .kam-on { border-left: 6px solid var(--accent-blue); background: rgba(96, 165, 250, 0.1); }
         .yan-on { border-left: 6px solid #f472b6; background: rgba(244, 114, 182, 0.1); }
         .mtr-style { border-left: 6px solid var(--accent-purple); background: rgba(192, 132, 252, 0.1); }
@@ -195,10 +97,10 @@
         .time-val { color: var(--accent-green); font-size: 1.3rem; text-align: right; font-weight: 800; }
         .special-note { font-size: 0.78rem; color: var(--accent-yellow); font-weight: normal; margin-top: 2px; display: block; }
         
-        /* 雲端備忘錄樣式 */
-        .memo-input-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        /* 備忘錄樣式 */
+        .memo-input-box { display: flex; gap: 10px; margin-bottom: 12px; }
         .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 10px 14px; border-radius: 12px; color: #fff; font-size: 1rem; outline: none; }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .memo-btn:hover { background: #2beebe; }
         
         .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
@@ -228,7 +130,7 @@
     <!-- 下方雙欄面板 -->
     <div class="main-grid">
         
-        <!-- 左欄：天氣、匯率、雲端備忘錄 -->
+        <!-- 左欄：天氣、匯率、備忘錄 -->
         <div>
             <div class="panel">
                 <div class="panel-title">
@@ -265,15 +167,17 @@
                 </div>
             </div>
 
-            <!-- 雲端同步備忘錄 (npoint 跨裝置完美同步版) -->
+            <!-- 備忘錄面板 -->
             <div class="panel">
-                <div class="panel-title">📝 雲端備忘錄 (跨裝置同步)</div>
+                <div class="panel-title">📝 雲端網址備忘錄</div>
+                
                 <div class="memo-input-box">
                     <input type="text" id="memo-input" class="memo-input" placeholder="輸入要記得嘅事..." onkeypress="if(event.key==='Enter')addMemo()">
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
+
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 10px;">雲端同步中...</div>
+                    <div style="color: #9ca3af; text-align: center; padding: 10px;">載入中...</div>
                 </div>
             </div>
         </div>
@@ -469,22 +373,40 @@
             }
         }
 
-        // ---------------- 5. 跨裝置雲端備忘錄 (npoint 專用通道) ----------------
-        const NPOINT_URL = "https://api.npoint.io/3c1e7a080d8805f63d6b"; // 獨立穩定同步點
-
-        async function loadMemos() {
-            try {
-                const res = await fetch(NPOINT_URL + "?t=" + new Date().getTime()); // 加時間戳防瀏覽器快取
-                const data = await res.json();
-                const memos = data.memos || [];
-                renderMemos(memos);
-            } catch (e) {
-                const local = JSON.parse(localStorage.getItem('my_memos') || '["隨時記低要辦的事"]');
-                renderMemos(local);
+        // ---------------- 5. 網址參數同步備忘錄 ----------------
+        function getMemos() {
+            const params = new URLSearchParams(window.location.search);
+            const memosParam = params.get('memos');
+            if (memosParam) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(escape(atob(memosParam))));
+                    if (Array.isArray(decoded)) {
+                        // 同步儲存至本機
+                        localStorage.setItem('my_dashboard_memos', JSON.stringify(decoded));
+                        return decoded;
+                    }
+                } catch(e) {}
             }
+            // 預設讀取本機
+            return JSON.parse(localStorage.getItem('my_dashboard_memos') || '["歡迎使用！備忘錄已準備就緒"]');
         }
 
-        function renderMemos(memos) {
+        function saveAndSyncMemos(memos) {
+            localStorage.setItem('my_dashboard_memos', JSON.stringify(memos));
+            
+            // 自動更新網址參數 (Base64 壓縮)
+            try {
+                const jsonStr = unescape(encodeURIComponent(JSON.stringify(memos)));
+                const encoded = btoa(jsonStr);
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?memos=" + encoded;
+                window.history.replaceState({path: newUrl}, '', newUrl);
+            } catch(e) {}
+
+            renderMemos();
+        }
+
+        function renderMemos() {
+            const memos = getMemos();
             const listEl = document.getElementById('memo-list');
             if (memos.length === 0) {
                 listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px;">目前沒有備忘</div>';
@@ -498,55 +420,22 @@
             `).join('');
         }
 
-        async function addMemo() {
+        function addMemo() {
             const input = document.getElementById('memo-input');
             const val = input.value.trim();
             if (!val) return;
 
-            try {
-                // 1. 取得最新資料
-                const getRes = await fetch(NPOINT_URL);
-                const data = await getRes.json();
-                let memos = data.memos || [];
-                memos.push(val);
-
-                // 2. 寫入雲端
-                const putRes = await fetch(NPOINT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ memos: memos })
-                });
-
-                if (putRes.ok) {
-                    input.value = '';
-                    loadMemos();
-                } else {
-                    alert('同步到雲端失敗！');
-                }
-            } catch (e) {
-                alert('網絡連線異常！');
-            }
+            let memos = getMemos();
+            memos.push(val);
+            saveAndSyncMemos(memos);
+            input.value = '';
         }
 
-        async function deleteMemo(index) {
-            try {
-                const getRes = await fetch(NPOINT_URL);
-                const data = await getRes.json();
-                let memos = data.memos || [];
-                memos.splice(index, 1);
-
-                await fetch(NPOINT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ memos: memos })
-                });
-
-                loadMemos();
-            } catch (e) {}
+        function deleteMemo(index) {
+            let memos = getMemos();
+            memos.splice(index, 1);
+            saveAndSyncMemos(memos);
         }
-
-        // 每隔 8 秒自動重新整理雲端備忘錄（確保其他裝置一更新，這邊好快同步）
-        setInterval(loadMemos, 8000);
 
         // ---------------- 啟動定時器 ----------------
         setInterval(updateTime, 1000);
@@ -560,7 +449,7 @@
         fetchExchangeRates();
         fetchMTRData();
         fetchRealBusETA();
-        loadMemos();
+        renderMemos();
     </script>
 </body>
 </html>
