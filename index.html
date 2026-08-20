@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard - 完美修正版</title>
+    <title>星空個人 Dashboard - 欣安邨版</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            <!-- 雲端備忘錄面板 (字體加大) -->
+            <!-- 雲端備忘錄面板 -->
             <div class="panel">
                 <div class="panel-title">
                     <span>📝 雲端備忘錄</span>
@@ -144,7 +144,7 @@
                 </div>
             </div>
 
-            <!-- 巴士面板 -->
+            <!-- 巴士面板 (已加回欣安邨與錦鞍苑) -->
             <div class="panel">
                 <div class="panel-title">🚌 官方實時巴士 (89C)</div>
                 
@@ -156,6 +156,11 @@
                 <div class="transport-row bus-normal">
                     <div>錦鞍苑 - 89C<span class="sub-note">往觀塘</span></div>
                     <span class="time-val" id="k-89c">--</span>
+                </div>
+
+                <div class="transport-row bus-normal" style="border-left-color: #38bdf8;">
+                    <div>欣安邨 - 89C<span class="sub-note">往觀塘</span></div>
+                    <span class="time-val" id="hin-89c">--</span>
                 </div>
             </div>
         </div>
@@ -184,12 +189,12 @@
             document.getElementById('fc-date-2').textContent = getFormattedDate(2);
             document.getElementById('fc-date-3').textContent = getFormattedDate(3);
 
-            // 深夜時間自動顯示已收車邏輯
             const hour = now.getHours();
             if (hour >= 1 && hour < 5) {
                 document.getElementById('mtr-up').textContent = '已收車';
                 document.getElementById('mtr-down').textContent = '已收車';
                 document.getElementById('k-89c').textContent = '已收車';
+                document.getElementById('hin-89c').textContent = '已收車';
             }
         }
 
@@ -213,20 +218,32 @@
             }
         }
 
+        // 帶有容錯同快取嘅雲端備忘錄讀取
         async function loadMemosFromCloud() {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     headers: { "X-Master-Key": MASTER_KEY }
                 });
+                if (!res.ok) throw new Error('Network error');
                 const data = await res.json();
                 const memos = data.record;
-                renderMemos(Array.isArray(memos) ? memos : []);
+                if (Array.isArray(memos)) {
+                    renderMemos(memos);
+                    localStorage.setItem('cached_memos', JSON.stringify(memos)); // 本地備份
+                }
             } catch (e) {
-                document.getElementById('memo-list').innerHTML = '<div style="color: #f87171; text-align: center; padding: 6px;">雲端連線失敗</div>';
+                // 如果雲端暫時失敗，嘗試讀取本地快取，避免突然彈紅字
+                const cached = localStorage.getItem('cached_memos');
+                if (cached) {
+                    renderMemos(JSON.parse(cached));
+                } else {
+                    document.getElementById('memo-list').innerHTML = '<div style="color: #f87171; text-align: center; padding: 6px; font-size: 1rem;">雲端連線中... (將自動重試)</div>';
+                }
             }
         }
 
         async function saveMemosToCloud(memos) {
+            localStorage.setItem('cached_memos', JSON.stringify(memos)); // 先存本地
             try {
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
@@ -237,7 +254,7 @@
                     body: JSON.stringify(memos)
                 });
             } catch (e) {
-                alert('雲端儲存失敗！');
+                // 背景靜默失敗，唔會阻礙用戶使用
             }
         }
 
