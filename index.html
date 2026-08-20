@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星空個人 Dashboard - 完美同步版</title>
+    <title>星空個人 Dashboard - 雲端同步版</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -19,7 +19,7 @@
             background-color: var(--bg-color); 
             color: var(--text-main); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 24px; 
+            padding: 16px; 
             margin: 0; 
             transition: background 0.5s ease;
         }
@@ -31,11 +31,11 @@
 
         .top-header { 
             background: var(--card-bg); 
-            padding: 24px 32px; 
-            border-radius: 24px; 
+            padding: 18px 24px; 
+            border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.08); 
             max-width: 1200px; 
-            margin: 0 auto 24px auto; 
+            margin: 0 auto 16px auto; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -43,71 +43,68 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
-        .clock { font-size: 3.2rem; font-weight: 800; color: var(--accent-blue); line-height: 1; letter-spacing: 1px; }
+        .clock { font-size: 3.5rem; font-weight: 800; color: var(--accent-blue); line-height: 1; letter-spacing: 1px; }
         .date-center { text-align: center; }
-        .date-main { font-size: 1.4rem; font-weight: 700; }
-        .lunar-main { font-size: 1.15rem; color: var(--accent-yellow); margin-top: 6px; font-weight: 500; }
+        .date-main { font-size: 1.5rem; font-weight: 700; }
+        .lunar-main { font-size: 1.25rem; color: var(--accent-yellow); margin-top: 4px; font-weight: 600; }
         
         .holiday-box { 
             text-align: right; 
             background: rgba(52, 211, 153, 0.08); 
             border: 1px solid rgba(52, 211, 153, 0.25); 
-            padding: 12px 18px; 
-            border-radius: 16px; 
+            padding: 10px 16px; 
+            border-radius: 14px; 
         }
-        .holiday-title { font-size: 0.8rem; color: var(--accent-green); font-weight: bold; text-transform: uppercase; }
-        .holiday-name { font-size: 1.05rem; color: #f3f4f6; margin-top: 3px; font-weight: 600; }
+        .holiday-title { font-size: 0.85rem; color: var(--accent-green); font-weight: bold; text-transform: uppercase; }
+        .holiday-name { font-size: 1.15rem; color: #f3f4f6; margin-top: 2px; font-weight: 700; }
 
-        .main-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; max-width: 1200px; margin: auto; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 16px; max-width: 1200px; margin: auto; }
         .panel { 
             background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: 24px; 
+            padding: 20px; 
+            border-radius: 20px; 
             border: 1px solid rgba(255,255,255,0.08); 
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         .panel-title { 
-            font-size: 1.35rem; color: var(--accent-green); font-weight: 700; margin-bottom: 20px; 
-            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; 
+            font-size: 1.4rem; color: var(--accent-green); font-weight: 700; margin-bottom: 16px; 
+            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; 
             display: flex; justify-content: space-between; align-items: center; 
         }
         
-        .wx-temp-box { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
-        .wx-temp { font-size: 3rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
-        .forecast-container { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-        .forecast-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 12px; font-size: 1rem; }
+        .wx-temp-box { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+        .wx-temp { font-size: 3.2rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
+        .forecast-container { margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .forecast-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 10px; font-size: 1.05rem; font-weight: 600; }
 
-        .fx-container { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; display: flex; gap: 12px; }
-        .fx-card { flex: 1; background: rgba(0,0,0,0.25); padding: 12px; border-radius: 14px; text-align: center; }
-        .fx-title { font-size: 0.85rem; color: #9ca3af; }
-        .fx-val { font-size: 1.2rem; font-weight: 700; color: var(--accent-blue); margin-top: 6px; }
+        .fx-container { margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; display: flex; gap: 12px; }
+        .fx-card { flex: 1; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 12px; text-align: center; }
+        .fx-title { font-size: 0.9rem; color: #9ca3af; }
+        .fx-val { font-size: 1.3rem; font-weight: 700; color: var(--accent-blue); margin-top: 4px; }
 
-        .transport-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; margin: 10px 0; border-radius: 16px; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .kam-on { border-left: 6px solid var(--accent-blue); background: rgba(96, 165, 250, 0.1); }
-        .yan-on { border-left: 6px solid #f472b6; background: rgba(244, 114, 182, 0.1); }
-        .mtr-style { border-left: 6px solid var(--accent-purple); background: rgba(192, 132, 252, 0.1); }
+        .transport-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; margin: 12px 0; border-radius: 16px; font-weight: 700; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .kam-on { border-left: 8px solid var(--accent-blue); background: rgba(96, 165, 250, 0.1); }
+        .yan-on { border-left: 8px solid #f472b6; background: rgba(244, 114, 182, 0.1); }
+        .mtr-style { border-left: 8px solid var(--accent-purple); background: rgba(192, 132, 252, 0.1); }
         
-        .time-val { color: var(--accent-green); font-size: 1.3rem; text-align: right; font-weight: 800; }
-        .special-note { font-size: 0.78rem; color: var(--accent-yellow); font-weight: normal; margin-top: 2px; display: block; }
+        .time-val { color: var(--accent-green); font-size: 1.6rem; text-align: right; font-weight: 800; }
+        .special-note { font-size: 0.85rem; color: var(--accent-yellow); font-weight: normal; margin-top: 4px; display: block; }
         
         .memo-input-box { display: flex; gap: 10px; margin-bottom: 12px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 10px 14px; border-radius: 12px; color: #fff; font-size: 1rem; outline: none; }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 16px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 12px 16px; border-radius: 12px; color: #fff; font-size: 1.1rem; outline: none; }
+        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
         .memo-btn:hover { background: #2beebe; }
         
-        .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
-        .memo-delete { color: #f87171; cursor: pointer; font-size: 0.85rem; background: none; border: none; }
+        .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 160px; overflow-y: auto; }
+        .memo-item { background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 600; }
+        .memo-delete { color: #f87171; cursor: pointer; font-size: 1rem; background: none; border: none; font-weight: bold; }
 
-        .sync-tip { background: rgba(96, 165, 250, 0.1); border: 1px dashed var(--accent-blue); padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 12px; color: #93c5fd; display: flex; justify-content: space-between; align-items: center; }
-        .sync-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 4px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        
-        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .refresh-memo-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
-        .night-badge { font-size: 0.75rem; background: rgba(251, 191, 36, 0.15); color: var(--accent-yellow); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.3); display: none; }
+        .night-badge { font-size: 0.8rem; background: rgba(251, 191, 36, 0.15); color: var(--accent-yellow); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.3); display: none; }
     </style>
 </head>
 <body>
@@ -130,20 +127,20 @@
         <div>
             <div class="panel">
                 <div class="panel-title">
-                    <span>☀️ 馬鞍山(沙田)氣象</span>
+                    <span>☀️ 馬鞍山氣象</span>
                     <span class="night-badge" id="night-mode-tag">🌙 護眼模式</span>
                 </div>
                 
                 <div>
-                    <div style="font-size: 0.9rem; color: #9ca3af;">📍 沙田區氣象站實況</div>
+                    <div style="font-size: 1rem; color: #9ca3af;">📍 沙田區氣象站實況</div>
                     <div class="wx-temp-box">
                         <span class="wx-temp" id="current-temp">--°C</span>
-                        <span style="font-size: 2rem;">⛅</span>
+                        <span style="font-size: 2.5rem;">⛅</span>
                     </div>
-                    <div style="margin-top: 8px;">狀況: <span id="current-desc" style="color:var(--accent-blue); font-weight:700;">實時連線中...</span></div>
+                    <div style="margin-top: 8px; font-size: 1.1rem;">狀況: <span id="current-desc" style="color:var(--accent-blue); font-weight:700;">實時連線中...</span></div>
                     
                     <div class="forecast-container">
-                        <div style="font-size: 0.95rem; color: var(--accent-green); font-weight: 700; margin-bottom: 4px;">🔮 未來 3 日預報參考</div>
+                        <div style="font-size: 1.05rem; color: var(--accent-green); font-weight: 700; margin-bottom: 2px;">🔮 未來 3 日預報</div>
                         <div class="forecast-row"><span id="fc-date-1">--</span><span id="fc-wx-1">晴間多雲</span></div>
                         <div class="forecast-row"><span id="fc-date-2">--</span><span id="fc-wx-2">部分時間有陽光</span></div>
                         <div class="forecast-row"><span id="fc-date-3">--</span><span id="fc-wx-3">微雨 / 驟雨</span></div>
@@ -166,22 +163,16 @@
             <div class="panel">
                 <div class="panel-title">
                     <span>📝 雲端備忘錄</span>
-                    <button class="refresh-memo-btn" onclick="location.reload()">🔄 重新整理備忘</button>
-                </div>
-                
-                <!-- 手機同步提示卡 -->
-                <div class="sync-tip" id="sync-bar" style="display:none;">
-                    <span>✨ 偵測到手機傳來嘅新備忘！</span>
-                    <button class="sync-btn" onclick="applyUrlSync()">立即同步</button>
+                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步雲端</button>
                 </div>
 
                 <div class="memo-input-box">
-                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入要記得嘅事..." onkeypress="if(event.key==='Enter')addMemo()">
+                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘..." onkeypress="if(event.key==='Enter')addMemo()">
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
 
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 10px;">載入中...</div>
+                    <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">正在連接雲端...</div>
                 </div>
             </div>
         </div>
@@ -202,26 +193,16 @@
             </div>
 
             <div class="panel">
-                <div class="panel-title">🚌 官方實時巴士到站</div>
+                <div class="panel-title">🚌 官方實時巴士 (89C)</div>
                 
                 <div class="transport-row kam-on">
                     <div>錦鞍苑 - 89C (往觀塘)<span class="special-note">九巴即時連線</span></div>
                     <span class="time-val" id="k-89c">連線中...</span>
                 </div>
                 
-                <div class="transport-row kam-on">
-                    <div>錦鞍苑 - 682A (往柴灣)<span class="special-note">城巴繁忙專線</span></div>
-                    <span class="time-val" id="k-682a">檢查中...</span>
-                </div>
-                
                 <div class="transport-row yan-on">
                     <div>欣安邨 - 89C (往觀塘)<span class="special-note">九巴即時連線</span></div>
                     <span class="time-val" id="y-89c">連線中...</span>
-                </div>
-                
-                <div class="transport-row yan-on">
-                    <div>欣安邨 - 682A (往柴灣)<span class="special-note">城巴繁忙專線</span></div>
-                    <span class="time-val" id="y-682a">檢查中...</span>
                 </div>
             </div>
         </div>
@@ -231,6 +212,11 @@
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.14/lunar.js"></script>
 
     <script>
+        // ==================== JSONBin.io 設定 ====================
+        const BIN_ID = "6a87123ada38895dfefbc1ca"; 
+        const MASTER_KEY = "$2a$10$HvcOoQBCbmfplG2XSkexuOAFTbJfJzpuucJSOImKmhiM3K//7f5kO";
+        // ========================================================
+
         function updateTime() {
             const now = new Date();
             const hours = now.getHours();
@@ -357,59 +343,41 @@
                 document.getElementById('k-89c').textContent = '5分鐘';
                 document.getElementById('y-89c').textContent = '7分鐘';
             }
+        }
 
-            const hour = now.getHours();
-            const day = now.getDay();
-            if (day >= 1 && day <= 5 && hour >= 7 && hour < 10) {
-                document.getElementById('k-682a').textContent = '6分鐘';
-                document.getElementById('y-682a').textContent = '12分鐘';
-            } else {
-                document.getElementById('k-682a').textContent = '非繁忙';
-                document.getElementById('y-682a').textContent = '非繁忙';
+        // ==================== 雲端備忘錄邏輯 ====================
+        async function loadMemosFromCloud() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": MASTER_KEY }
+                });
+                const data = await res.json();
+                const memos = data.record;
+                renderMemos(Array.isArray(memos) ? memos : []);
+            } catch (e) {
+                document.getElementById('memo-list').innerHTML = '<div style="color: #f87171; text-align: center; padding: 10px;">雲端連線失敗，請檢查 API Key</div>';
             }
         }
 
-        // ---------------- 智能備忘錄管理 ----------------
-        let pendingMemosFromUrl = null;
-
-        function initMemos() {
-            const params = new URLSearchParams(window.location.search);
-            const memosParam = params.get('memos');
-            
-            if (memosParam) {
-                try {
-                    const decoded = JSON.parse(decodeURIComponent(escape(atob(memosParam))));
-                    if (Array.isArray(decoded)) {
-                        pendingMemosFromUrl = decoded;
-                        document.getElementById('sync-bar').style.display = 'flex';
-                    }
-                } catch(e) {}
+        async function saveMemosToCloud(memos) {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "X-Master-Key": MASTER_KEY 
+                    },
+                    body: JSON.stringify(memos)
+                });
+            } catch (e) {
+                alert('儲存至雲端失敗！');
             }
         }
 
-        function getMemos() {
-            return JSON.parse(localStorage.getItem('my_dashboard_memos') || '["歡迎使用！請直接 Bookmark 呢條主網址"]');
-        }
-
-        function saveMemos(memos) {
-            localStorage.setItem('my_dashboard_memos', JSON.stringify(memos));
-            renderMemos();
-        }
-
-        function applyUrlSync() {
-            if (pendingMemosFromUrl) {
-                saveMemos(pendingMemosFromUrl);
-                document.getElementById('sync-bar').style.display = 'none';
-                alert('成功同步最新備忘！');
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-        }
-
-        function renderMemos() {
-            const memos = getMemos();
+        function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
             if (memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px;">目前沒有備忘</div>';
+                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 8px; font-size: 1.1rem;">目前沒有備忘</div>';
                 return;
             }
             listEl.innerHTML = memos.map((text, index) => `
@@ -418,38 +386,42 @@
                     <button class="memo-delete" onclick="deleteMemo(${index})">刪除</button>
                 </div>
             `).join('');
+            window.currentMemos = memos; 
         }
 
-        function addMemo() {
+        async function addMemo() {
             const input = document.getElementById('memo-input');
             const val = input.value.trim();
             if (!val) return;
 
-            let memos = getMemos();
+            let memos = window.currentMemos || [];
             memos.push(val);
-            saveMemos(memos);
             input.value = '';
+            renderMemos(memos);
+            await saveMemosToCloud(memos);
         }
 
-        function deleteMemo(index) {
-            let memos = getMemos();
+        async function deleteMemo(index) {
+            let memos = window.currentMemos || [];
             memos.splice(index, 1);
-            saveMemos(memos);
+            renderMemos(memos);
+            await saveMemosToCloud(memos);
         }
+        // ========================================================
 
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000);
         setInterval(fetchExchangeRates, 3600000);
         setInterval(fetchMTRData, 15000);
         setInterval(fetchRealBusETA, 30000);
+        setInterval(loadMemosFromCloud, 30000); 
 
         updateTime(); 
         fetchWeather();
-        fetchExchangeRates();
+        fetchExchangeRates ();
         fetchMTRData();
         fetchRealBusETA();
-        initMemos();
-        renderMemos();
+        loadMemosFromCloud(); 
     </script>
 </body>
 </html>
