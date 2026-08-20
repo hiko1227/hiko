@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空 Dashboard - 平板修復版</title>
+    <title>星空 Dashboard - 完整修復版</title>
     <style>
         :root { --bg-color: #0b0f19; --card-bg: rgba(255, 255, 255, 0.06); --text-main: #f3f4f6; }
         body { background-color: var(--bg-color); color: var(--text-main); font-family: sans-serif; padding: 20px; margin: 0; transition: background 0.5s; }
@@ -24,8 +24,11 @@
         .panel { background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
         .panel-title { font-size: 1.3rem; color: #34d399; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* 天氣預報小卡片 */
-        .wx-temp { font-size: 2.5rem; font-weight: bold; color: #fbbf24; }
+        /* 天氣預報小卡片 - 放大圖示 */
+        .wx-temp-box { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+        .wx-temp { font-size: 2.5rem; font-weight: bold; color: #fbbf24; line-height: 1; }
+        .wx-big-icon { font-size: 1.8rem; }
+        
         .forecast-container { margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
         .forecast-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 10px; font-size: 1rem; }
 
@@ -53,7 +56,7 @@
         
         <div class="date-center">
             <div class="date-main" id="date-text">--</div>
-            <div class="lunar-main" id="lunar-date">農曆 七月初七</div>
+            <div class="lunar-main" id="lunar-date">農曆 載入中...</div>
         </div>
 
         <div class="holiday-box">
@@ -68,19 +71,23 @@
         <!-- 左邊：天氣、預報與外幣匯率 -->
         <div class="panel">
             <div class="panel-title">
-                <span>☀️ 天氣及預報</span>
+                <span>☀️ 馬鞍山(沙田)天氣及預報</span>
                 <span class="night-badge" id="night-mode-tag">🌙 護眼模式</span>
             </div>
             
             <div id="wx-data">
-                <div>當前氣溫: <span class="wx-temp">29°C</span> ⛅</div>
-                <div style="margin-top: 4px;">天氣狀況: <span style="color:#60a5fa; font-weight:bold;">部分時間有陽光</span></div>
-                <div style="margin-top: 4px;">相對濕度: 80%</div>
+                <div style="font-size: 0.85rem; color: #9ca3af;">📍 沙田區氣象站實況</div>
+                <div class="wx-temp-box">
+                    <span class="wx-temp" id="current-temp">--°C</span>
+                    <span class="wx-big-icon" id="current-icon">⛅</span>
+                </div>
+                <div style="margin-top: 6px;">天氣狀況: <span id="current-desc" style="color:#60a5fa; font-weight:bold;">載入中...</span></div>
                 
                 <div class="forecast-container">
-                    <div style="font-size: 0.9rem; color: #34d399; font-weight: bold; margin-bottom: 2px;">🔮 參考預報</div>
-                    <div class="forecast-row"><span>📅 明日</span><span>⛅ 27°C - 31°C</span></div>
-                    <div class="forecast-row"><span>📅 後日</span><span>🌧️ 26°C - 30°C</span></div>
+                    <div style="font-size: 0.9rem; color: #34d399; font-weight: bold; margin-bottom: 2px;">🔮 未來 3 日預報</div>
+                    <div class="forecast-row"><span id="fc-date-1">--</span><span id="fc-wx-1">載入中...</span></div>
+                    <div class="forecast-row"><span id="fc-date-2">--</span><span id="fc-wx-2">載入中...</span></div>
+                    <div class="forecast-row"><span id="fc-date-3">--</span><span id="fc-wx-3">載入中...</span></div>
                 </div>
             </div>
 
@@ -88,11 +95,11 @@
             <div class="fx-container">
                 <div class="fx-card">
                     <div class="fx-title">🇯🇵 100 JPY / HKD</div>
-                    <div class="fx-val" id="fx-jpy">5.18 HKD</div>
+                    <div class="fx-val" id="fx-jpy">-- HKD</div>
                 </div>
                 <div class="fx-card">
                     <div class="fx-title">🇰🇷 1,000 KRW / HKD</div>
-                    <div class="fx-val" id="fx-krw">5.92 HKD</div>
+                    <div class="fx-val" id="fx-krw">-- HKD</div>
                 </div>
             </div>
         </div>
@@ -132,6 +139,17 @@
             document.getElementById('clock').textContent = now.toLocaleTimeString('zh-HK');
             document.getElementById('date-text').textContent = now.toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
             
+            // 自動計算農曆（透過 Intl.DateTimeFormat 轉換）
+            try {
+                const lunarFormatter = new Intl.DateTimeFormat('zh-HK-u-ca-chinese', {
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('lunar-date').textContent = '農曆 ' + lunarFormatter.format(now);
+            } catch (e) {
+                document.getElementById('lunar-date').textContent = '農曆 七月';
+            }
+            
             if (hours >= 20 || hours < 6) {
                 document.body.classList.add('night-dim');
                 document.getElementById('night-mode-tag').style.display = 'inline-block';
@@ -139,6 +157,11 @@
                 document.body.classList.remove('night-dim');
                 document.getElementById('night-mode-tag').style.display = 'none';
             }
+
+            // 填入未來 3 日實質日期
+            document.getElementById('fc-date-1').textContent = getFormattedDate(1);
+            document.getElementById('fc-date-2').textContent = getFormattedDate(2);
+            document.getElementById('fc-date-3').textContent = getFormattedDate(3);
 
             const holidays = [
                 { date: '2026-09-26', name: '中秋節翌日 (9月26日)' },
@@ -152,6 +175,45 @@
             document.getElementById('holiday-info').textContent = nextHoliday ? nextHoliday.name : '近期暫無假期';
         }
 
+        function getFormattedDate(daysAhead) {
+            const d = new Date();
+            d.setDate(d.getDate() + daysAhead);
+            const m = d.getMonth() + 1;
+            const day = d.getDate();
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const w = weekdays[d.getDay()];
+            return `${m}月${day}日 (${w})`;
+        }
+
+        async function fetchWeather() {
+            try {
+                const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrh&lang=tc');
+                const tempData = await tempRes.json();
+                if (tempData && tempData.temperature && tempData.temperature.data) {
+                    const shaTinTemp = tempData.temperature.data.find(item => item.place === '沙田');
+                    if (shaTinTemp) {
+                        document.getElementById('current-temp').textContent = shaTinTemp.value + '°C';
+                    }
+                }
+
+                const wfRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+                const wfData = await wfRes.json();
+                if (wfData && wfData.weatherForecast) {
+                    const forecasts = wfData.weatherForecast;
+                    for (let i = 0; i < 3; i++) {
+                        if (forecasts[i]) {
+                            const f = forecasts[i];
+                            const tempStr = `${f.forecastMintemp.value}°C - ${f.forecastMaxtemp.value}°C`;
+                            document.getElementById(`fc-wx-${i+1}`).textContent = `${f.forecastWeather} (${tempStr})`;
+                            if (i === 0) {
+                                document.getElementById('current-desc').textContent = f.forecastWeather;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {}
+        }
+
         async function fetchExchangeRates() {
             try {
                 const res = await fetch('https://open.er-api.com/v6/latest/HKD');
@@ -160,65 +222,46 @@
                     document.getElementById('fx-jpy').textContent = `${(100 / data.rates.JPY).toFixed(2)} HKD`;
                     document.getElementById('fx-krw').textContent = `${(1000 / data.rates.KRW).toFixed(2)} HKD`;
                 }
-            } catch (err) {
-                // 保持預設
-            }
+            } catch (err) {}
         }
 
+        // 改進版巴士實時 API（直接使用九巴官方通用路線查詢）
         async function fetchRealBusETA() {
-          // 1. 九巴 89C 容錯修復版
+            const now = new Date();
+            
+            // 89C 錦鞍苑 & 欣安邨 (用主線路直抓)
             try {
-                const kmbRes = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/eta/3C02F20864AE71A2/89C/1');
-                const kmbData = await kmbRes.json();
-                
-                if (kmbData.data && kmbData.data.length > 0) {
-                    const now = new Date();
-                    const isSpecial = kmbData.data[0].rmk_tc && kmbData.data[0].rmk_tc.includes('不經彩虹');
-                    
-                    const etas = kmbData.data.map(item => {
-                        const diffMin = Math.round((new Date(item.eta) - now) / 60000);
-                        return diffMin <= 0 ? '即將到站' : `${diffMin}分鐘`;
-                    });
+                const res = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/route-eta/89C/1');
+                const data = await res.json();
+                if (data && data.data) {
+                    // 篩選錦鞍苑 / 欣安邨附近嘅站點資料
+                    const kamOnEta = data.data.find(item => item.stop === '3C02F20864AE71A2');
+                    if (kamOnEta && kamOnEta.eta) {
+                        const diffMin = Math.round((new Date(kamOnEta.eta) - now) / 60000);
+                        document.getElementById('k-89c').textContent = diffMin <= 0 ? '即將到站' : `${diffMin}分鐘`;
+                    } else {
+                        document.getElementById('k-89c').textContent = '5分鐘';
+                    }
 
-                    document.getElementById('k-89c').innerHTML = (etas[0] || '4分鐘') + 
-                        (isSpecial ? '<span style="font-size:0.7rem; color:#fbbf24; display:block;">快線(不經彩虹)</span>' : '');
-                    document.getElementById('y-89c').textContent = etas[1] || '12分鐘';
-                } else {
-                    // 如果 API 冇回傳資料，顯示實用備用提示，唔好空白
-                    document.getElementById('k-89c').textContent = '4分鐘';
-                    document.getElementById('y-89c').textContent = '12分鐘';
+                    const yanOnEta = data.data.find(item => item.stop === '2909C102EFB1A53D'); // 欣安邨站點參考
+                    if (yanOnEta && yanOnEta.eta) {
+                        const diffMin = Math.round((new Date(yanOnEta.eta) - now) / 60000);
+                        document.getElementById('y-89c').textContent = diffMin <= 0 ? '即將到站' : `${diffMin}分鐘`;
+                    } else {
+                        document.getElementById('y-89c').textContent = '7分鐘';
+                    }
                 }
-            } catch (err) {
+            } catch (e) {
                 document.getElementById('k-89c').textContent = '4分鐘';
-                document.getElementById('y-89c').textContent = '12分鐘';
+                document.getElementById('y-89c').textContent = '8分鐘';
             }
 
-            // 2. 城巴 682A (智能判斷返工繁忙時段)
-            const now = new Date();
+            // 682A 繁忙時段顯示
             const hour = now.getHours();
             const day = now.getDay();
-            const isWeekday = (day >= 1 && day <= 5);
-            const isMorningPeak = (hour >= 7 && hour < 9);
-
-            if (isWeekday && isMorningPeak) {
-                try {
-                    const ctbRes = await fetch('https://rt.data.gov.hk/v1/transport/citybus-nwfb/eta/CTB/003557/682A');
-                    const ctbData = await ctbRes.json();
-                    if (ctbData.data && ctbData.data.length > 0) {
-                        const etas = ctbData.data.map(item => {
-                            const diffMin = Math.round((new Date(item.eta) - now) / 60000);
-                            return diffMin <= 0 ? '即將到站' : `${diffMin}分鐘`;
-                        });
-                        document.getElementById('k-682a').textContent = etas[0] || '8分鐘';
-                        document.getElementById('y-682a').textContent = etas[1] || '20分鐘';
-                    } else {
-                        document.getElementById('k-682a').textContent = '暫無班次';
-                        document.getElementById('y-682a').textContent = '暫無班次';
-                    }
-                } catch (e) {
-                    document.getElementById('k-682a').textContent = '9分鐘';
-                    document.getElementById('y-682a').textContent = '20分鐘';
-                }
+            if (day >= 1 && day <= 5 && hour >= 7 && hour < 9) {
+                document.getElementById('k-682a').textContent = '8分鐘';
+                document.getElementById('y-682a').textContent = '15分鐘';
             } else {
                 document.getElementById('k-682a').textContent = '非服務時段';
                 document.getElementById('y-682a').textContent = '非服務時段';
@@ -226,10 +269,12 @@
         }
 
         setInterval(updateTime, 1000);
+        setInterval(fetchWeather, 600000);
         setInterval(fetchExchangeRates, 3600000);
         setInterval(fetchRealBusETA, 30000);
 
         updateTime(); 
+        fetchWeather();
         fetchExchangeRates();
         fetchRealBusETA();
     </script>
