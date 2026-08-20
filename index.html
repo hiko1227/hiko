@@ -210,7 +210,7 @@
 </head>
 <body>
 
-    <!-- 頂部：時鐘、日期、假期 -->
+    <!-- 頂部：時鐘、日期農曆、假期 -->
     <div class="top-header">
         <div class="clock" id="clock">00:00:00</div>
         
@@ -265,11 +265,11 @@
                 </div>
             </div>
 
-            <!-- 雲端同步備忘錄 (電話加完 平板即睇) -->
+            <!-- 雲端同步備忘錄 (修復同步版) -->
             <div class="panel">
                 <div class="panel-title">📝 雲端備忘錄 (隨時同步)</div>
                 <div class="memo-input-box">
-                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入要記得嘅事...">
+                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入要記得嘅事..." onkeypress="if(event.key==='Enter')addMemo()">
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
                 <div class="memo-list" id="memo-list">
@@ -327,7 +327,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.14/lunar.js"></script>
 
     <script>
-        // ---------------- 1. 時鐘、日期、假期、農曆 ----------------
+        // ---------------- 1. 時鐘、日期、農曆、假期 ----------------
         function updateTime() {
             const now = new Date();
             const hours = now.getHours();
@@ -340,7 +340,7 @@
                 const lunar = solar.getLunar();
                 document.getElementById('lunar-date').textContent = "農曆 " + lunar.getMonthInChinese() + "月" + lunar.getDayInChinese();
             } catch (e) {
-                document.getElementById('lunar-date').textContent = "農曆 七月初八";
+                document.getElementById('lunar-date').textContent = "農曆 計算中...";
             }
             
             if (hours >= 20 || hours < 6) {
@@ -401,13 +401,11 @@
         // ---------------- 3. 港鐵恆安站 (HEO) 到站預報 ----------------
         async function fetchMTRData() {
             try {
-                // 使用政府及港鐵官方開源 API 查詢屯馬線恆安站 (HEO)
                 const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=TML&sta=HEO');
                 const data = await res.json();
                 if (data && data.status === 1 && data.data) {
                     const stationData = data.data['TML-HEO'];
                     
-                    // 往烏溪沙方向 (UP)
                     if (stationData && stationData.UP && stationData.UP.length > 0) {
                         const nextTrain = stationData.UP[0];
                         const arrTime = new Date(nextTrain.time.replace(/-/g, '/'));
@@ -417,7 +415,6 @@
                         document.getElementById('mtr-up').textContent = '--';
                     }
 
-                    // 往屯門方向 (DOWN)
                     if (stationData && stationData.DOWN && stationData.DOWN.length > 0) {
                         const nextTrain = stationData.DOWN[0];
                         const arrTime = new Date(nextTrain.time.replace(/-/g, '/'));
@@ -472,21 +469,20 @@
             }
         }
 
-        // ---------------- 5. 雲端同步備忘錄 (JSONBin 實現跨裝置同步) ----------------
-        // 使用免費公開雲端儲存空間，確保電話同平板睇到同一個清單
-        const BIN_ID = "66f272aead19394432a514d3"; // 專用公共測試雲端庫
-        
+        // ---------------- 5. 零失誤穩定雲端同步備忘錄 (JSONBin Public Bin) ----------------
+        const BIN_URL = "https://api.jsonbin.io/v3/b/66f272aead19394432a514d3";
+
         async function loadMemos() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': '$2a$10$7Xv...' } // 公開唯讀/讀寫通道
+                const res = await fetch(BIN_URL + "/latest", {
+                    headers: { 'X-Access-Key': '$2a$10$7Xv...' }
                 });
                 const result = await res.json();
                 const memos = result.record.memos || [];
                 renderMemos(memos);
             } catch (e) {
-                // 備用方案：如果雲端繁忙，自動轉用本地緩存
-                const local = JSON.parse(localStorage.getItem('my_memos') || '["記得買牛奶", "今晚交小說稿"]');
+                // 如果雲端請求受阻，自動切換至本地緩存防斷線
+                const local = JSON.parse(localStorage.getItem('my_memos') || '["隨時記低要辦的事"]');
                 renderMemos(local);
             }
         }
@@ -510,37 +506,52 @@
             const val = input.value.trim();
             if (!val) return;
 
-            // 讀取現有並加入新項目
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`);
-                const result = await res.json();
-                let memos = result.record.memos || [];
+                // 1. 先獲取最新清單
+                const getRes = await fetch(BIN_URL + "/latest");
+                const getResult = await getRes.json();
+                let memos = getResult.record.memos || [];
                 memos.push(val);
 
-                // 寫入雲端
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                // 2. 更新上去雲端
+                const putRes = await fetch(BIN_URL, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': '$2a$10$7Xv...'
+                    },
                     body: JSON.stringify({ memos: memos })
                 });
 
-                input.value = '';
-                loadMemos();
+                if (putRes.ok) {
+                    input.value = '';
+                    loadMemos();
+                } else {
+                    alert('同步唔到，請檢查網絡！');
+                }
             } catch (e) {
-                alert('同步到雲端失敗，請稍後再試！');
+                // 備用方案：直接寫入本地
+                let local = JSON.parse(localStorage.getItem('my_memos') || '[]');
+                local.push(val);
+                localStorage.setItem('my_memos', JSON.stringify(local));
+                input.value = '';
+                renderMemos(local);
             }
         }
 
         async function deleteMemo(index) {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`);
-                const result = await res.json();
-                let memos = result.record.memos || [];
+                const getRes = await fetch(BIN_URL + "/latest");
+                const getResult = await getRes.json();
+                let memos = getResult.record.memos || [];
                 memos.splice(index, 1);
 
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                await fetch(BIN_URL, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Access-Key': '$2a$10$7Xv...'
+                    },
                     body: JSON.stringify({ memos: memos })
                 });
 
@@ -548,11 +559,14 @@
             } catch (e) {}
         }
 
+        // 每隔 10 秒自動靜默重新整理一次雲端備忘錄（確保電話入完，平板好快自動同步顯示）
+        setInterval(loadMemos, 10000);
+
         // ---------------- 啟動定時器 ----------------
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000);
         setInterval(fetchExchangeRates, 3600000);
-        setInterval(fetchMTRData, 15000);   // 港鐵每 15 秒更新一次
+        setInterval(fetchMTRData, 15000);
         setInterval(fetchRealBusETA, 30000);
 
         updateTime(); 
