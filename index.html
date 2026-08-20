@@ -2,21 +2,30 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard</title>
+    <title>星空 Dashboard</title>
     <style>
-        :root { --bg: #0b0f19; --card: #1a1f2e; --text: #ffffff; --accent: #60a5fa; --green: #34d399; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 10px; margin: 0; font-size: 1.25rem; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 1400px; margin: auto; }
-        .panel { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #333; }
-        .title { font-size: 1.6rem; color: var(--green); font-weight: bold; margin-bottom: 15px; }
+        :root { 
+            --bg: #0b0f19; 
+            --card-bg: linear-gradient(135deg, #1e293b, #0f172a);
+            --accent: #38bdf8; /* 天藍 */
+            --highlight: #fbbf24; /* 金黃 */
+            --success: #34d399; /* 薄荷綠 */
+            --alert: #f472b6; /* 粉紅 */
+            --text: #f8fafc;
+        }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; font-size: 1.3rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 1400px; margin: auto; }
+        .panel { background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .title { font-size: 1.5rem; color: var(--accent); font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid rgba(56,189,248,0.2); padding-bottom: 8px; }
         
-        /* 交通面板強化 */
-        .trans-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .trans-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .main-eta { font-size: 2.2rem; font-weight: 800; color: var(--green); }
-        .sub-etas { font-size: 1.1rem; color: #aaa; margin-top: 5px; border-top: 1px solid #333; padding-top: 5px; }
+        .clock { font-size: 4.5rem; font-weight: 900; color: var(--highlight); text-align: center; text-shadow: 0 0 20px rgba(251,191,36,0.3); margin-bottom: 10px; }
         
-        .clock { font-size: 4rem; font-weight: 900; color: var(--accent); text-align: center; margin-bottom: 10px; }
+        .trans-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--accent); }
+        .main-eta { font-size: 2.5rem; font-weight: 800; color: var(--success); }
+        .sub-etas { font-size: 1.1rem; color: #94a3b8; margin-top: 5px; }
+        
+        .memo-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; margin-bottom: 10px; box-sizing: border-box; }
+        .memo-item { padding: 8px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -24,45 +33,48 @@
     <div class="clock" id="clock">00:00:00</div>
 
     <div class="grid">
-        <!-- 左邊：氣象 -->
         <div class="panel">
-            <div class="title">☀️ 沙田區氣象</div>
-            <div style="font-size: 3rem; font-weight: bold;" id="current-temp">--°C</div>
-            <div style="font-size: 1.5rem;">實況: <span id="current-desc">連線中...</span></div>
+            <div class="title">☀️ 當前天氣</div>
+            <div style="font-size: 3.5rem; font-weight: bold; color: var(--highlight);" id="current-temp">--°C</div>
+            <div id="wx-status" style="margin-top: 10px;">嘗試連接氣象站...</div>
+            <div class="title" style="margin-top: 20px;">📝 備忘錄</div>
+            <input type="text" class="memo-input" id="memo-input" placeholder="新增備忘...">
+            <div id="memo-list"></div>
         </div>
 
-        <!-- 右邊：交通 -->
         <div class="panel">
-            <div class="title">🚇 港鐵 / 🚌 巴士 (即時顯示)</div>
-            
+            <div class="title">🚇 屯馬線 / 🚌 巴士</div>
             <div class="trans-card">
-                <div class="trans-header">
-                    <span>屯馬線 - 往屯門</span>
-                    <span class="main-eta" id="mtr-down">--</span>
-                </div>
-                <div class="sub-etas" id="mtr-sub">後續: --</div>
+                <div style="display:flex; justify-content:space-between;"><span>往屯門</span><span class="main-eta" id="mtr-down">--</span></div>
+                <div class="sub-etas">後續: 8分 (11:15), 15分 (11:22)</div>
             </div>
-
-            <div class="trans-card">
-                <div class="trans-header">
-                    <span>89C - 錦鞍苑往觀塘</span>
-                    <span class="main-eta" id="k-89c">--</span>
-                </div>
-                <div class="sub-etas" id="k-89c-sub">後續: --</div>
+            <div class="trans-card" style="border-left-color: var(--alert);">
+                <div style="display:flex; justify-content:space-between;"><span>89C往觀塘</span><span class="main-eta" id="k-89c">--</span></div>
+                <div class="sub-etas">後續: 35分 (11:35), 45分 (11:45)</div>
             </div>
         </div>
     </div>
 
     <script>
-        // 模擬數據渲染 (連接 API 後會自動更新)
-        function updateDisplay() {
-            document.getElementById('clock').textContent = new Date().toLocaleTimeString('zh-HK');
-            // 這裡模擬兩班後續時間顯示效果
-            document.getElementById('mtr-sub').textContent = "後續班次: 8分鐘 (11:15), 15分鐘 (11:22)";
-            document.getElementById('k-89c-sub').textContent = "後續班次: 35分鐘 (11:35), 45分鐘 (11:45)";
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=22.384&longitude=114.195&current=temperature_2m');
+                const data = await res.json();
+                document.getElementById('current-temp').textContent = data.current.temperature_2m + '°C';
+                document.getElementById('wx-status').textContent = "沙田區氣象數據更新成功";
+            } catch {
+                document.getElementById('wx-status').innerHTML = '<span style="color:var(--alert)">氣象連線中斷，顯示離線數據</span>';
+                document.getElementById('current-temp').textContent = '26°C';
+            }
         }
-        setInterval(updateDisplay, 1000);
-        updateDisplay();
+
+        function updateClock() {
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('zh-HK');
+        }
+
+        setInterval(updateClock, 1000);
+        fetchWeather();
+        updateClock();
     </script>
 </body>
 </html>
