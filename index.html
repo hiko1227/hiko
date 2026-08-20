@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard - 雲端同步版</title>
+    <title>星空個人 Dashboard - 完美修正版</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -68,16 +68,16 @@
         .bus-normal { border-left: 6px solid var(--accent-green); }
         .bus-special { border-left: 6px solid var(--accent-orange); background: rgba(245, 158, 11, 0.12); }
         
-        .time-val { color: var(--accent-green); font-size: 1.4rem; font-weight: 800; }
+        .time-val { color: var(--accent-green); font-size: 1.3rem; font-weight: 800; text-align: right; }
         .sub-note { font-size: 0.85rem; color: #9ca3af; font-weight: normal; display: block; }
         
         .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 1.1rem; outline: none; }
+        .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 1.15rem; outline: none; }
         .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
         
         .memo-list { display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; font-weight: 600; }
-        .memo-delete { color: #f87171; cursor: pointer; font-size: 0.9rem; background: none; border: none; font-weight: bold; }
+        .memo-item { background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: 600; }
+        .memo-delete { color: #f87171; cursor: pointer; font-size: 1rem; background: none; border: none; font-weight: bold; }
         .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
     </style>
 </head>
@@ -104,13 +104,13 @@
                 
                 <div class="forecast-container">
                     <div style="font-size: 0.95rem; color: var(--accent-green); font-weight: 700;">🔮 未來 3 日預報</div>
-                    <div class="forecast-row"><span id="fc-date-1">--</span><span id="fc-wx-1">晴間多雲 (27°C / 32°C)</span></div>
-                    <div class="forecast-row"><span id="fc-date-2">--</span><span id="fc-wx-2">部分時間有陽光 (26°C / 31°C)</span></div>
-                    <div class="forecast-row"><span id="fc-date-3">--</span><span id="fc-wx-3">微雨 / 驟雨 (25°C / 29°C)</span></div>
+                    <div class="forecast-row"><span id="fc-date-1">--</span><span id="fc-wx-1">晴間多雲 (27°C - 32°C)</span></div>
+                    <div class="forecast-row"><span id="fc-date-2">--</span><span id="fc-wx-2">部分時間有陽光 (26°C - 31°C)</span></div>
+                    <div class="forecast-row"><span id="fc-date-3">--</span><span id="fc-wx-3">微雨 / 驟雨 (25°C - 29°C)</span></div>
                 </div>
             </div>
 
-            <!-- 雲端備忘錄面板 (已恢復 JSONBin) -->
+            <!-- 雲端備忘錄面板 (字體加大) -->
             <div class="panel">
                 <div class="panel-title">
                     <span>📝 雲端備忘錄</span>
@@ -123,39 +123,39 @@
                 </div>
 
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 0.95rem;">正在連接雲端...</div>
+                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1rem;">正在連接雲端...</div>
                 </div>
             </div>
         </div>
 
         <div>
-            <!-- 港鐵面板 (恆安站雙向) -->
+            <!-- 港鐵面板 -->
             <div class="panel">
                 <div class="panel-title">🚇 港鐵恆安站 (屯馬線)</div>
                 
                 <div class="transport-row mtr-up">
-                    <div>往 烏溪沙<span class="sub-note">後續: 5分, 12分</span></div>
-                    <span class="time-val" id="mtr-up">3分</span>
+                    <div>往 烏溪沙<span class="sub-note" id="sub-up">查詢中...</span></div>
+                    <span class="time-val" id="mtr-up">--</span>
                 </div>
                 
                 <div class="transport-row mtr-down">
-                    <div>往 屯門<span class="sub-note">後續: 6分, 13分</span></div>
-                    <span class="time-val" id="mtr-down">2分</span>
+                    <div>往 屯門<span class="sub-note" id="sub-down">查詢中...</span></div>
+                    <span class="time-val" id="mtr-down">--</span>
                 </div>
             </div>
 
-            <!-- 巴士面板 (89C + 特別班次醒目顯示) -->
+            <!-- 巴士面板 -->
             <div class="panel">
                 <div class="panel-title">🚌 官方實時巴士 (89C)</div>
                 
                 <div class="transport-row bus-special">
-                    <div>🔥 錦鞍苑 [特別班次]<span class="sub-note">往觀塘 (直達/特快)</span></div>
-                    <span class="time-val" style="color: var(--accent-orange);" id="k-special">10分</span>
+                    <div>🔥 錦鞍苑 [特別班次]<span class="sub-note">往觀塘 (早高峰專用)</span></div>
+                    <span class="time-val" style="color: var(--accent-orange);" id="k-special">非服務時間</span>
                 </div>
 
                 <div class="transport-row bus-normal">
-                    <div>錦鞍苑 - 89C<span class="sub-note">往觀塘 (普通班次 | 後續: 25分)</span></div>
-                    <span class="time-val" id="k-89c">18分</span>
+                    <div>錦鞍苑 - 89C<span class="sub-note">往觀塘</span></div>
+                    <span class="time-val" id="k-89c">--</span>
                 </div>
             </div>
         </div>
@@ -180,10 +180,17 @@
                 document.getElementById('lunar-date').textContent = "農曆 計算中...";
             }
 
-            document.getElementById('fc-date-1').previousElementSibling ? '' : null;
             document.getElementById('fc-date-1').textContent = getFormattedDate(1);
             document.getElementById('fc-date-2').textContent = getFormattedDate(2);
             document.getElementById('fc-date-3').textContent = getFormattedDate(3);
+
+            // 深夜時間自動顯示已收車邏輯
+            const hour = now.getHours();
+            if (hour >= 1 && hour < 5) {
+                document.getElementById('mtr-up').textContent = '已收車';
+                document.getElementById('mtr-down').textContent = '已收車';
+                document.getElementById('k-89c').textContent = '已收車';
+            }
         }
 
         function getFormattedDate(daysAhead) {
@@ -192,7 +199,20 @@
             return `${d.getMonth() + 1}月${d.getDate()}日`;
         }
 
-        // 雲端備忘錄邏輯 (JSONBin)
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=22.3840&longitude=114.1950&current=temperature_2m,weather_code');
+                const data = await res.json();
+                if (data && data.current) {
+                    document.getElementById('current-temp').textContent = data.current.temperature_2m + '°C';
+                    document.getElementById('current-desc').textContent = '沙田氣象站實況正常';
+                }
+            } catch (e) {
+                document.getElementById('current-temp').textContent = '28°C';
+                document.getElementById('current-desc').textContent = '離線參考值';
+            }
+        }
+
         async function loadMemosFromCloud() {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
@@ -224,7 +244,7 @@
         function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
             if (memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 0.95rem;">目前沒有備忘</div>';
+                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1rem;">目前沒有備忘</div>';
                 return;
             }
             listEl.innerHTML = memos.map((text, index) => `
@@ -256,9 +276,11 @@
         }
 
         setInterval(updateTime, 1000);
+        setInterval(fetchWeather, 600000);
         setInterval(loadMemosFromCloud, 30000); 
 
         updateTime(); 
+        fetchWeather();
         loadMemosFromCloud(); 
     </script>
 </body>
