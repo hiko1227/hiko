@@ -103,6 +103,9 @@
 
         .sync-tip { background: rgba(96, 165, 250, 0.1); border: 1px dashed var(--accent-blue); padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 12px; color: #93c5fd; display: flex; justify-content: space-between; align-items: center; }
         .sync-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 4px 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        
+        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .refresh-memo-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
         .night-badge { font-size: 0.75rem; background: rgba(251, 191, 36, 0.15); color: var(--accent-yellow); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.3); display: none; }
     </style>
@@ -161,7 +164,10 @@
 
             <!-- 備忘錄面板 -->
             <div class="panel">
-                <div class="panel-title">📝 雲端備忘錄</div>
+                <div class="panel-title">
+                    <span>📝 雲端備忘錄</span>
+                    <button class="refresh-memo-btn" onclick="location.reload()">🔄 重新整理備忘</button>
+                </div>
                 
                 <!-- 手機同步提示卡 -->
                 <div class="sync-tip" id="sync-bar" style="display:none;">
@@ -375,7 +381,6 @@
                     const decoded = JSON.parse(decodeURIComponent(escape(atob(memosParam))));
                     if (Array.isArray(decoded)) {
                         pendingMemosFromUrl = decoded;
-                        // 顯示「立即同步」提示橫幅
                         document.getElementById('sync-bar').style.display = 'flex';
                     }
                 } catch(e) {}
@@ -396,7 +401,6 @@
                 saveMemos(pendingMemosFromUrl);
                 document.getElementById('sync-bar').style.display = 'none';
                 alert('成功同步最新備忘！');
-                // 清理網址，還原為乾淨嘅永恆主網址
                 window.history.replaceState({}, '', window.location.pathname);
             }
         }
