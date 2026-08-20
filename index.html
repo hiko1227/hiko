@@ -265,15 +265,15 @@
                 </div>
             </div>
 
-            <!-- 雲端同步備忘錄 (修復同步版) -->
+            <!-- 雲端同步備忘錄 (npoint 跨裝置完美同步版) -->
             <div class="panel">
-                <div class="panel-title">📝 雲端備忘錄 (隨時同步)</div>
+                <div class="panel-title">📝 雲端備忘錄 (跨裝置同步)</div>
                 <div class="memo-input-box">
                     <input type="text" id="memo-input" class="memo-input" placeholder="輸入要記得嘅事..." onkeypress="if(event.key==='Enter')addMemo()">
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 10px;">載入備忘中...</div>
+                    <div style="color: #9ca3af; text-align: center; padding: 10px;">雲端同步中...</div>
                 </div>
             </div>
         </div>
@@ -469,19 +469,16 @@
             }
         }
 
-        // ---------------- 5. 零失誤穩定雲端同步備忘錄 (JSONBin Public Bin) ----------------
-        const BIN_URL = "https://api.jsonbin.io/v3/b/66f272aead19394432a514d3";
+        // ---------------- 5. 跨裝置雲端備忘錄 (npoint 專用通道) ----------------
+        const NPOINT_URL = "https://api.npoint.io/3c1e7a080d8805f63d6b"; // 獨立穩定同步點
 
         async function loadMemos() {
             try {
-                const res = await fetch(BIN_URL + "/latest", {
-                    headers: { 'X-Access-Key': '$2a$10$7Xv...' }
-                });
-                const result = await res.json();
-                const memos = result.record.memos || [];
+                const res = await fetch(NPOINT_URL + "?t=" + new Date().getTime()); // 加時間戳防瀏覽器快取
+                const data = await res.json();
+                const memos = data.memos || [];
                 renderMemos(memos);
             } catch (e) {
-                // 如果雲端請求受阻，自動切換至本地緩存防斷線
                 const local = JSON.parse(localStorage.getItem('my_memos') || '["隨時記低要辦的事"]');
                 renderMemos(local);
             }
@@ -507,19 +504,16 @@
             if (!val) return;
 
             try {
-                // 1. 先獲取最新清單
-                const getRes = await fetch(BIN_URL + "/latest");
-                const getResult = await getRes.json();
-                let memos = getResult.record.memos || [];
+                // 1. 取得最新資料
+                const getRes = await fetch(NPOINT_URL);
+                const data = await getRes.json();
+                let memos = data.memos || [];
                 memos.push(val);
 
-                // 2. 更新上去雲端
-                const putRes = await fetch(BIN_URL, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Access-Key': '$2a$10$7Xv...'
-                    },
+                // 2. 寫入雲端
+                const putRes = await fetch(NPOINT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ memos: memos })
                 });
 
@@ -527,31 +521,23 @@
                     input.value = '';
                     loadMemos();
                 } else {
-                    alert('同步唔到，請檢查網絡！');
+                    alert('同步到雲端失敗！');
                 }
             } catch (e) {
-                // 備用方案：直接寫入本地
-                let local = JSON.parse(localStorage.getItem('my_memos') || '[]');
-                local.push(val);
-                localStorage.setItem('my_memos', JSON.stringify(local));
-                input.value = '';
-                renderMemos(local);
+                alert('網絡連線異常！');
             }
         }
 
         async function deleteMemo(index) {
             try {
-                const getRes = await fetch(BIN_URL + "/latest");
-                const getResult = await getRes.json();
-                let memos = getResult.record.memos || [];
+                const getRes = await fetch(NPOINT_URL);
+                const data = await getRes.json();
+                let memos = data.memos || [];
                 memos.splice(index, 1);
 
-                await fetch(BIN_URL, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Access-Key': '$2a$10$7Xv...'
-                    },
+                await fetch(NPOINT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ memos: memos })
                 });
 
@@ -559,8 +545,8 @@
             } catch (e) {}
         }
 
-        // 每隔 10 秒自動靜默重新整理一次雲端備忘錄（確保電話入完，平板好快自動同步顯示）
-        setInterval(loadMemos, 10000);
+        // 每隔 8 秒自動重新整理雲端備忘錄（確保其他裝置一更新，這邊好快同步）
+        setInterval(loadMemos, 8000);
 
         // ---------------- 啟動定時器 ----------------
         setInterval(updateTime, 1000);
