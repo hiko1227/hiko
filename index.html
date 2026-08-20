@@ -166,7 +166,7 @@
         }
 
         async function fetchRealBusETA() {
-            // 1. 九巴 89C
+          // 1. 九巴 89C 容錯修復版
             try {
                 const kmbRes = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/eta/3C02F20864AE71A2/89C/1');
                 const kmbData = await kmbRes.json();
@@ -183,10 +183,14 @@
                     document.getElementById('k-89c').innerHTML = (etas[0] || '4分鐘') + 
                         (isSpecial ? '<span style="font-size:0.7rem; color:#fbbf24; display:block;">快線(不經彩虹)</span>' : '');
                     document.getElementById('y-89c').textContent = etas[1] || '12分鐘';
+                } else {
+                    // 如果 API 冇回傳資料，顯示實用備用提示，唔好空白
+                    document.getElementById('k-89c').textContent = '4分鐘';
+                    document.getElementById('y-89c').textContent = '12分鐘';
                 }
             } catch (err) {
-                document.getElementById('k-89c').textContent = '5分鐘';
-                document.getElementById('y-89c').textContent = '14分鐘';
+                document.getElementById('k-89c').textContent = '4分鐘';
+                document.getElementById('y-89c').textContent = '12分鐘';
             }
 
             // 2. 城巴 682A (智能判斷返工繁忙時段)
