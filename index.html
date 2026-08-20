@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard - 月相面板版</title>
+    <title>星空個人 Dashboard - 完美終極版</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -45,9 +45,32 @@
         .clock { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
         .ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
-        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; text-align: right; }
-        .moon-icon { font-size: 2.2rem; line-height: 1; }
+        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; text-align: right; }
+        .moon-text-box { display: flex; flex-direction: column; justify-content: center; }
         .moon-text { font-size: 1.05rem; font-weight: 600; color: var(--accent-purple); }
+
+        /* 真實感月相球體 CSS 渲染 */
+        .realistic-moon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #e5e7eb 0%, #9ca3af 40%, #1f2937 70%, #030712 100%);
+            box-shadow: inset -8px -4px 12px rgba(0, 0, 0, 0.9), 0 0 10px rgba(192, 132, 252, 0.3);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .moon-shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+            transform-origin: center;
+        }
 
         .main-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8px; max-width: 1200px; margin: auto; }
         .panel { 
@@ -103,13 +126,15 @@
             <span class="ampm" id="ampm">--</span>
         </div>
 
-        <!-- 右邊：月相 -->
+        <!-- 右邊：真實感月相面板 -->
         <div class="header-right">
-            <div>
+            <div class="moon-text-box">
                 <div class="moon-text" id="moon-name">月相計算中</div>
-                <div class="sub-note" id="moon-sub">農曆日對應</div>
+                <div class="sub-note" id="moon-sub">農曆計算</div>
             </div>
-            <div class="moon-icon" id="moon-icon">🌕</div>
+            <div class="realistic-moon">
+                <div class="moon-shadow" id="moon-shadow"></div>
+            </div>
         </div>
     </div>
 
@@ -166,12 +191,17 @@
                 </div>
             </div>
 
-            <!-- 巴士面板 -->
+            <!-- 巴士面板 (89C 特別班次拆分兩站) -->
             <div class="panel">
                 <div class="panel-title">🚌 官方實時巴士 (89C)</div>
                 
                 <div class="transport-row bus-special">
-                    <div>🔥 89C 特快/特別班次<span class="sub-note">途經: 欣安邨 / 錦鞍苑開出</span></div>
+                    <div>🔥 欣安邨 - 89C [特別班次]<span class="sub-note">往觀塘 (早高峰特快)</span></div>
+                    <span class="time-val" style="color: var(--accent-orange);" id="hin-special">非服務時間</span>
+                </div>
+
+                <div class="transport-row bus-special" style="border-left-color: #f97316; background: rgba(249, 115, 22, 0.08);">
+                    <div>🔥 錦鞍苑 - 89C [特別班次]<span class="sub-note">往觀塘 (早高峰特快)</span></div>
                     <span class="time-val" style="color: var(--accent-orange);" id="k-special">非服務時間</span>
                 </div>
 
@@ -203,7 +233,7 @@
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
-            hours = hours ? hours : 12; // 0點轉為12
+            hours = hours ? hours : 12;
             const hoursStr = String(hours).padStart(2, '0');
 
             document.getElementById('clock').textContent = `${hoursStr}:${minutes}:${seconds}`;
@@ -213,28 +243,47 @@
             document.getElementById('date-text').textContent = now.toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric'});
             document.getElementById('weekday-text').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
 
-            // 月相計算 (透過 lunar-javascript 取得農曆日推算月相)
+            // 真實月相與陰影變換計算
             try {
                 const solar = Solar.fromDate(now);
                 const lunar = solar.getLunar();
-                const dayZh = lunar.getDayInChinese(); // 初一、十五等
-                const lunarDay = lunar.getDay(); // 1-30數字
+                const dayZh = lunar.getDayInChinese();
+                const lunarDay = lunar.getDay(); // 1-30
 
-                let moonEmoji = '🌕';
                 let moonDesc = '滿月';
+                let shadowTransform = 'translateX(0%)'; // 預設滿月
 
-                if (lunarDay === 1) { moonEmoji = '🌑'; moonDesc = '新月 (朔)'; }
-                else if (lunarDay > 1 && lunarDay < 7) { moonEmoji = '🌒'; moonDesc = '娥眉月'; }
-                else if (lunarDay === 7 || lunarDay === 8) { moonEmoji = '🌓'; moonDesc = '上弦月'; }
-                else if (lunarDay > 8 && lunarDay < 15) { moonEmoji = '🌔'; moonDesc = '盈凸月'; }
-                else if (lunarDay === 15 || lunarDay === 16) { moonEmoji = '🌕'; moonDesc = '滿月 (望)'; }
-                else if (lunarDay > 16 && lunarDay < 22) { moonEmoji = '🌖'; moonDesc = '虧凸月'; }
-                else if (lunarDay === 22 || lunarDay === 23) { moonEmoji = '🌗'; moonDesc = '下弦月'; }
-                else { moonEmoji = '🌘'; moonDesc = '殘月'; }
+                // 根據農曆日計算光影遮罩位置（模擬真實北半球月相圖）
+                // lunarDay 1 = 新月 (全黑), 7 = 上弦月 (半圓), 15 = 滿月 (全亮), 22 = 下弦月 (半圓)
+                if (lunarDay === 1) {
+                    moonDesc = '新月 (朔)';
+                    shadowTransform = 'translateX(0%)'; // 全黑
+                } else if (lunarDay > 1 && lunarDay < 7) {
+                    moonDesc = '娥眉月';
+                    shadowTransform = 'translateX(35%)'; 
+                } else if (lunarDay === 7 || lunarDay === 8) {
+                    moonDesc = '上弦月';
+                    shadowTransform = 'translateX(50%)'; // 半邊亮
+                } else if (lunarDay > 8 && lunarDay < 15) {
+                    moonDesc = '盈凸月';
+                    shadowTransform = 'translateX(75%)';
+                } else if (lunarDay === 15 || lunarDay === 16) {
+                    moonDesc = '滿月 (望)';
+                    shadowTransform = 'translateX(100%)'; // 全亮
+                } else if (lunarDay > 16 && lunarDay < 22) {
+                    moonDesc = '虧凸月';
+                    shadowTransform = 'translateX(-75%)';
+                } else if (lunarDay === 22 || lunarDay === 23) {
+                    moonDesc = '下弦月';
+                    shadowTransform = 'translateX(-50%)';
+                } else {
+                    moonDesc = '殘月';
+                    shadowTransform = 'translateX(-35%)';
+                }
 
-                document.getElementById('moon-icon').textContent = moonEmoji;
                 document.getElementById('moon-name').textContent = moonDesc;
                 document.getElementById('moon-sub').textContent = `農曆${lunar.getMonthInChinese()}月${dayZh}`;
+                document.getElementById('moon-shadow').style.transform = shadowTransform;
             } catch (e) {
                 document.getElementById('moon-name').textContent = '月相計算中';
             }
@@ -247,6 +296,8 @@
             if (hour >= 1 && hour < 5) {
                 document.getElementById('mtr-up').textContent = '已收車';
                 document.getElementById('mtr-down').textContent = '已收車';
+                document.getElementById('hin-special').textContent = '已收車';
+                document.getElementById('k-special').textContent = '已收車';
                 document.getElementById('k-89c').textContent = '已收車';
                 document.getElementById('hin-89c').textContent = '已收車';
             }
@@ -322,6 +373,8 @@
             `).join('');
             window.currentMemos = memos; 
         }
+
+        async function addMenu() {} // placeholder
 
         async function addMemo() {
             const input = document.getElementById('memo-input');
