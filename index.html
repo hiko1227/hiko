@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard - 全官方實時版</title>
+    <title>星空個人 Dashboard</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -32,22 +32,22 @@
             max-width: 1200px; 
             margin: 0 auto 8px auto; 
             display: grid; 
-            grid-template-columns: 1.2fr 1.5fr 1fr; 
+            grid-template-columns: 1.5fr 1.5fr 0.5fr; 
             align-items: center; 
             backdrop-filter: blur(10px);
         }
         
-        .header-left { display: flex; flex-direction: column; justify-content: center; }
-        .date-main { font-size: 1.15rem; font-weight: 700; color: var(--text-main); }
-        .date-sub { font-size: 1rem; color: var(--accent-blue); font-weight: 600; margin-top: 2px; }
+        /* 左邊：日期與星期同一行，字型大小同時間一致 */
+        .header-left { display: flex; align-items: baseline; gap: 10px; }
+        .date-combined { font-size: 2.2rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.5px; }
 
+        /* 中間：時間與 AM/PM */
         .header-center { text-align: center; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
-        .clock { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
-        .ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
+        .clock { font-size: 2.2rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
+        .ampm { font-size: 1.1rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
-        .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; text-align: right; }
-        .moon-text-box { display: flex; flex-direction: column; justify-content: center; }
-        .moon-text { font-size: 1.05rem; font-weight: 600; color: var(--accent-purple); }
+        /* 右邊：只留純月亮圖 */
+        .header-right { display: flex; align-items: center; justify-content: flex-end; }
 
         .realistic-moon {
             width: 48px;
@@ -113,10 +113,9 @@
 <body>
 
     <div class="top-header">
-        <!-- 左邊：日期 -->
+        <!-- 左邊：日期與星期同一行，字型大小同時間一致 -->
         <div class="header-left">
-            <div class="date-main" id="date-text">--</div>
-            <div class="date-sub" id="weekday-text">--</div>
+            <span class="date-combined" id="date-combined-text">--</span>
         </div>
 
         <!-- 中間：時間與 AM/PM -->
@@ -125,13 +124,9 @@
             <span class="ampm" id="ampm">--</span>
         </div>
 
-        <!-- 右邊：真實感月相面板 -->
+        <!-- 右邊：只留純月亮圖 -->
         <div class="header-right">
-            <div class="moon-text-box">
-                <div class="moon-text" id="moon-name">月相計算中</div>
-                <div class="sub-note" id="moon-sub">農曆計算</div>
-            </div>
-            <div class="realistic-moon">
+            <div class="realistic-moon" title="即時月相">
                 <div class="moon-shadow" id="moon-shadow"></div>
             </div>
         </div>
@@ -144,7 +139,7 @@
                 <div class="panel-title"><span>☀️ 香港天文台 (沙田實況)</span></div>
                 <div class="wx-temp-box">
                     <span class="wx-temp" id="current-temp">--°C</span>
-                    <span style="font-size: 2.2rem;" id="wx-icon">⛅</span>
+                    <span style="font-size: 2.2rem;">⛅</span>
                 </div>
                 <div style="margin-top: 4px; font-size: 1rem;">狀況: <span id="current-desc" style="color:var(--accent-blue); font-weight:700;">天文台數據連線中...</span></div>
                 
@@ -175,7 +170,7 @@
         </div>
 
         <div>
-            <!-- 港鐵面板 (MTR 官方實時 Next Train API) -->
+            <!-- 港鐵面板 -->
             <div class="panel">
                 <div class="panel-title">🚇 港鐵恆安站 (屯馬線)</div>
                 
@@ -190,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- 巴士面板 (89C 官方實時 ETA 對接) -->
+            <!-- 巴士面板 (89C 官方實時 ETA) -->
             <div class="panel">
                 <div class="panel-title">🚌 官方實時巴士 (89C)</div>
                 
@@ -236,49 +231,43 @@
             document.getElementById('clock').textContent = `${hoursStr}:${minutes}:${seconds}`;
             document.getElementById('ampm').textContent = ampm;
 
-            document.getElementById('date-text').textContent = now.toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric'});
-            document.getElementById('weekday-text').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
+            // 日期與星期組合成同一行 (例如: 8月21日 星期五)
+            const dateStr = now.toLocaleDateString('zh-HK', {month:'long', day:'numeric'});
+            const weekdayStr = now.toLocaleDateString('zh-HK', {weekday:'long'});
+            document.getElementById('date-combined-text').textContent = `${dateStr} ${weekdayStr}`;
 
+            // 月相光影計算
             try {
                 const solar = Solar.fromDate(now);
                 const lunar = solar.getLunar();
-                const dayZh = lunar.getDayInChinese();
                 const lunarDay = lunar.getDay();
-
-                let moonDesc = '滿月';
                 let shadowTransform = 'translateX(0%)';
 
-                if (lunarDay === 1) { moonDesc = '新月 (朔)'; shadowTransform = 'translateX(0%)'; }
-                else if (lunarDay > 1 && lunarDay < 7) { moonDesc = '娥眉月'; shadowTransform = 'translateX(35%)'; }
-                else if (lunarDay === 7 || lunarDay === 8) { moonDesc = '上弦月'; shadowTransform = 'translateX(50%)'; }
-                else if (lunarDay > 8 && lunarDay < 15) { moonDesc = '盈凸月'; shadowTransform = 'translateX(75%)'; }
-                else if (lunarDay === 15 || lunarDay === 16) { moonDesc = '滿月 (望)'; shadowTransform = 'translateX(100%)'; }
-                else if (lunarDay > 16 && lunarDay < 22) { moonDesc = '虧凸月'; shadowTransform = 'translateX(-75%)'; }
-                else if (lunarDay === 22 || lunarDay === 23) { moonDesc = '下弦月'; shadowTransform = 'translateX(-50%)'; }
-                else { moonDesc = '殘月'; shadowTransform = 'translateX(-35%)'; }
+                if (lunarDay === 1) shadowTransform = 'translateX(0%)';
+                else if (lunarDay > 1 && lunarDay < 7) shadowTransform = 'translateX(35%)';
+                else if (lunarDay === 7 || lunarDay === 8) shadowTransform = 'translateX(50%)';
+                else if (lunarDay > 8 && lunarDay < 15) shadowTransform = 'translateX(75%)';
+                else if (lunarDay === 15 || lunarDay === 16) shadowTransform = 'translateX(100%)';
+                else if (lunarDay > 16 && lunarDay < 22) shadowTransform = 'translateX(-75%)';
+                else if (lunarDay === 22 || lunarDay === 23) shadowTransform = 'translateX(-50%)';
+                else shadowTransform = 'translateX(-35%)';
 
-                document.getElementById('moon-name').textContent = moonDesc;
-                document.getElementById('moon-sub').textContent = `農曆${lunar.getMonthInChinese()}月${dayZh}`;
                 document.getElementById('moon-shadow').style.transform = shadowTransform;
-            } catch (e) {
-                document.getElementById('moon-name').textContent = '月相計算中';
-            }
+            } catch (e) {}
         }
 
-        // 港鐵 MTR 官方實時 Next Train API (恆安站 HET, 屯馬線 MOS)
+        // 港鐵 MTR 官方實時 API
         async function fetchMTR() {
             try {
                 const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=MOS&sta=HET');
                 const data = await res.json();
                 if (data && data.status === 1 && data.data && data.data['HET']) {
                     const hetData = data.data['HET'];
-                    
-                    // UP = 往烏溪沙方向 (UP), DOWN = 往屯門方向 (DOWN)
                     parseMTRDirection(hetData.UP, 'mtr-up');
                     parseMTRDirection(hetData.DOWN, 'mtr-down');
                 } else {
-                    document.getElementById('mtr-up').textContent = '非繁忙/暫無資料';
-                    document.getElementById('mtr-down').textContent = '非繁忙/暫無資料';
+                    document.getElementById('mtr-up').textContent = '暫無資料';
+                    document.getElementById('mtr-down').textContent = '暫無資料';
                 }
             } catch (e) {
                 document.getElementById('mtr-up').textContent = '暫時無法連接';
@@ -295,12 +284,10 @@
             let times = [];
             directionObj.ts.forEach(train => {
                 if (train.time) {
-                    // 港鐵 API 回傳格式為 "2026-08-21 07:15:00"
                     let arrivalTime = new Date(train.time.replace(/-/g, '/'));
                     let now = new Date();
                     let diffMin = Math.round((arrivalTime - now) / 60000);
                     if (diffMin <= 0) {
-                        times.path = '將至';
                         times.push('將至');
                     } else {
                         times.push(`${diffMin}分鐘`);
@@ -311,7 +298,7 @@
             document.getElementById(elementId).textContent = times.length > 0 ? times.slice(0, 2).join(', ') : '--';
         }
 
-        // 香港天文台 HKO 官方天氣 API
+        // 天文台 HKO 官方 API
         async function fetchWeather() {
             try {
                 const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrh&lang=tc');
@@ -466,7 +453,7 @@
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000); 
         setInterval(fetchBusETA, 30000); 
-        setInterval(fetchMTR, 30000); // 每30秒更新一次港鐵恆安站實時班次
+        setInterval(fetchMTR, 30000); 
         setInterval(loadMemosFromCloud, 30000); 
 
         updateTime(); 
