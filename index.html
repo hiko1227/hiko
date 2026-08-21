@@ -95,7 +95,7 @@
         .bus-normal { border-left: 6px solid var(--accent-green); }
         .bus-special { border-left: 6px solid var(--accent-orange); background: rgba(245, 158, 11, 0.12); }
         
-        .time-val { color: var(--accent-green); font-size: 1.1rem; font-weight: 800; text-align: right; }
+        .time-val { color: var(--accent-green); font-size: 1.05rem; font-weight: 800; text-align: right; }
         .sub-note { font-size: 0.85rem; color: #9ca3af; font-weight: normal; display: block; }
         
         .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
@@ -249,7 +249,7 @@
 
         async function fetchMTR() {
             try {
-                const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=MOS&sta=HET');
+                const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=MOS&sta=HET', { cache: 'no-cache' });
                 const data = await res.json();
                 if (data && data.status === 1 && data.data && data.data['HET']) {
                     const hetData = data.data['HET'];
@@ -278,7 +278,6 @@
                     let now = new Date();
                     let diffMin = Math.round((arrivalTime - now) / 60000);
                     
-                    // 格式化確實到站時間 (例如 09:24)
                     let hh = String(arrivalTime.getHours()).padStart(2, '0');
                     let mm = String(arrivalTime.getMinutes()).padStart(2, '0');
                     let timeFormatted = `${hh}:${mm}`;
@@ -296,7 +295,7 @@
 
         async function fetchWeather() {
             try {
-                const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrh&lang=tc');
+                const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc', { cache: 'no-cache' });
                 const tempData = await tempRes.json();
                 if (tempData && tempData.temperature && tempData.temperature.data) {
                     const shatin = tempData.temperature.data.find(item => item.place === "沙田");
@@ -305,7 +304,7 @@
                     }
                 }
 
-                const forecastRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+                const forecastRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc', { cache: 'no-cache' });
                 const forecastData = await forecastRes.json();
                 if (forecastData && forecastData.weatherForecast && forecastData.weatherForecast.length > 0) {
                     let f = forecastData.weatherForecast[0];
@@ -325,7 +324,7 @@
 
         async function fetchBusETA() {
             try {
-                const res = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/eta/route/89C');
+                const res = await fetch('https://data.etabus.gov.hk/v1/transport/kmb/eta/route/89C', { cache: 'no-cache' });
                 const data = await res.json();
                 if (data && data.data) {
                     const etas = data.data;
