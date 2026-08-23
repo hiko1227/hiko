@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>3008 Tablet Dashboard</title>
+    <!-- 引入農曆與節氣計算庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.14/lunar.js"></script>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -74,8 +76,8 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        .clock { font-size: 2.5rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
-        .ampm { font-size: 0.9rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
+        .clock { font-size: 2.3rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
+        .ampm { font-size: 0.85rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
         .wx-box { display: flex; align-items: center; justify-content: space-between; }
         .wx-temp { font-size: 2.2rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
@@ -85,7 +87,7 @@
             50% { opacity: 0.5; transform: scale(0.98); box-shadow: 0 0 2px rgba(248, 113, 113, 0.1); }
             100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
         }
-        .warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
         .warning-badge {
             background: rgba(248, 113, 113, 0.2);
             color: var(--accent-red);
@@ -162,34 +164,44 @@
 <body>
 
     <div class="main-grid">
-        <!-- 左上：大時鐘 + 假期倒數 -->
+        <!-- 左上：大時鐘 + 農曆/節氣 + 假期倒數 -->
         <div class="panel">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: baseline; gap: 6px;">
-                    <span class="date-part" id="date-part" style="font-size: 1rem; font-weight: bold;">--</span>
-                    <span class="weekday-part" id="weekday-part" style="font-size: 1rem; font-weight: bold; color: var(--accent-blue);">--</span>
+                    <span class="date-part" id="date-part" style="font-size: 0.95rem; font-weight: bold;">--</span>
+                    <span class="weekday-part" id="weekday-part" style="font-size: 0.95rem; font-weight: bold; color: var(--accent-blue);">--</span>
                 </div>
                 <button class="theme-toggle-btn" onclick="toggleTheme()" title="切換 Light / Dark 模式">🌓</button>
             </div>
+
+            <!-- 農曆與節氣資訊列 -->
+            <div id="lunar-info" style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 600; text-align: center; background: rgba(192,132,252,0.1); padding: 3px 6px; border-radius: 6px; border: 1px solid rgba(192,132,252,0.2);">
+                載入農曆中...
+            </div>
             
-            <div style="text-align: center; margin: 4px 0;">
+            <div style="text-align: center; margin: 2px 0;">
                 <div style="display: flex; align-items: baseline; justify-content: center; gap: 6px;">
                     <span class="clock" id="clock">00:00:00</span>
                     <span class="ampm" id="ampm">--</span>
                 </div>
             </div>
 
-            <div id="holiday-countdown" style="background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                <span style="font-size: 0.85rem; color: #9ca3af;">計算假期中...</span>
+            <div id="holiday-countdown" style="background: rgba(0,0,0,0.2); padding: 5px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                <span style="font-size: 0.8rem; color: #9ca3af;">計算假期中...</span>
             </div>
         </div>
 
-        <!-- 右上：天氣資訊 + 天氣警告提示 -->
+        <!-- 右上：天氣資訊（含濕度） + 天氣警告提示 -->
         <div class="panel">
             <div class="wx-box">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 38px; height: 38px; display: none;" onerror="this.style.display='none'">
-                    <span class="wx-temp" id="current-temp">--°C</span>
+                    <div>
+                        <span class="wx-temp" id="current-temp">--°C</span>
+                        <div style="font-size: 0.85rem; color: var(--accent-blue); font-weight: bold; margin-top: 2px;">
+                            濕度: <span id="current-humidity">--%</span>
+                        </div>
+                    </div>
                 </div>
                 <div style="text-align: right; font-size: 0.9rem; font-weight: 600;">
                     <div>最高: <span id="wx-max" style="color: var(--accent-orange);">--°C</span></div>
@@ -200,7 +212,7 @@
             <div style="font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: auto;">香港天文台數據</div>
         </div>
 
-        <!-- 左下：港鐵恆安站（橫向分開左右行/兩欄展示） + 雲端備忘錄 -->
+        <!-- 左下：港鐵恆安站 + 雲端備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 0.9rem;">載入港鐵實時資料中...</div>
@@ -220,7 +232,7 @@
             </div>
         </div>
 
-        <!-- 右下：九巴實時到站（保留普通及特別燈號） -->
+        <!-- 右下：九巴實時到站 -->
         <div class="panel">
             <div class="transit-input-box">
                 <input type="text" id="bus-route-input" class="transit-input" style="width: 50px; text-align: center;" placeholder="路線">
@@ -286,6 +298,30 @@
             document.getElementById('ampm').textContent = ampm;
             document.getElementById('date-part').textContent = now.toLocaleDateString('zh-HK', {month:'long', day:'numeric'});
             document.getElementById('weekday-part').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
+
+            // 計算農曆與節氣
+            try {
+                const solar = Solar.fromDate(now);
+                const lunar = solar.getLunar();
+                const gzYear = lunar.getYearInGanZhi();
+                const shengXiao = lunar.getYearShengXiao();
+                const lunarMonth = lunar.getMonthInChinese();
+                const lunarDay = lunar.getDayInChinese();
+                
+                let jieQi = lunar.getJieQi();
+                if (!jieQi) {
+                    // 若當天非節氣，顯示最近或下一個節氣，或者當前所處節氣
+                    jieQi = lunar.getPrevJieQi() ? lunar.getPrevJieQi().getName() : '';
+                }
+
+                let lunarText = `${gzYear}年 (${shengXiao}年) ${lunarMonth}月${lunarDay}`;
+                if (jieQi) {
+                    lunarText += ` | 節氣: ${jieQi}`;
+                }
+                document.getElementById('lunar-info').textContent = lunarText;
+            } catch (e) {
+                document.getElementById('lunar-info').style.display = 'none';
+            }
         }
 
         function updateHolidayCountdown() {
@@ -308,7 +344,7 @@
                 el.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 0.8rem; color: #9ca3af;">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
-                        <span style="font-size: 1rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
+                        <span style="font-size: 0.95rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
                     </div>
                 `;
             } else {
@@ -320,10 +356,24 @@
             try {
                 const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
                 const tempData = await tempRes.json();
+                
+                // 氣溫
                 if (tempData?.temperature?.data) {
                     const shatin = tempData.temperature.data.find(i => i.place === "沙田");
                     if (shatin) document.getElementById('current-temp').textContent = shatin.value + '°C';
                 }
+
+                // 濕度
+                if (tempData?.humidity?.data) {
+                    const shatinHumid = tempData.humidity.data.find(i => i.place === "沙田");
+                    if (shatinHumid) {
+                        document.getElementById('current-humidity').textContent = shatinHumid.value + '%';
+                    } else if (tempData.humidity.data.length > 0) {
+                        document.getElementById('current-humidity').textContent = tempData.humidity.data[0].value + '%';
+                    }
+                }
+
+                // 天氣圖示
                 if (tempData?.icon && tempData.icon.length > 0) {
                     const iconCode = tempData.icon[0];
                     const iconImg = document.getElementById('wx-icon-img');
