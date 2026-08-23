@@ -131,6 +131,7 @@
             border: 1px solid transparent;
         }
         .pill-active-special { background: rgba(251, 191, 36, 0.25); color: var(--accent-yellow); border-color: rgba(251, 191, 36, 0.5); }
+        .pill-active-normal { background: rgba(52, 211, 153, 0.2); color: var(--accent-green); border-color: rgba(52, 211, 153, 0.4); }
     </style>
 </head>
 <body>
@@ -417,12 +418,15 @@
                         
                         // 原定班次綠色，特別班次黃色
                         const timeColor = isSpecial ? 'var(--accent-yellow)' : 'var(--accent-green)';
-                        const remarkTagHtml = isSpecial ? `<span class="status-pill pill-active-special">${rmkText || '特別班次'}</span>` : '';
+                        
+                        // 標籤顯示內容與對應顏色
+                        const tagText = rmkText || (isSpecial ? '特別班次' : '普通');
+                        const tagClass = isSpecial ? 'pill-active-special' : 'pill-active-normal';
 
                         return `
                             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
                                 <span style="color: #9ca3af;">${idx + 1}: <strong style="color: ${timeColor}; font-size: 1.2rem;">${timeStr}</strong> <span style="font-size: 1rem;">(${clockTime})</span></span>
-                                <div>${remarkTagHtml}</div>
+                                <div><span class="status-pill ${tagClass}">${tagText}</span></div>
                             </div>
                         `;
                     }).join('');
