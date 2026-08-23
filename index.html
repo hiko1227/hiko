@@ -2,73 +2,94 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>3008 Tablet Dashboard - Big View</title>
+    <title>3008 Tablet Dashboard</title>
     <style>
         :root { 
-            --bg-color: #0b0f19; 
-            --card-bg: rgba(255, 255, 255, 0.06); 
-            --text-main: #f3f4f6; 
-            --accent-blue: #60a5fa;
-            --accent-green: #34d399;
-            --accent-yellow: #fbbf24;
-            --accent-purple: #c084fc;
-            --accent-orange: #f59e0b;
-            --accent-red: #f87171;
+            --bg-color: #f3f4f6; 
+            --card-bg: #ffffff; 
+            --text-main: #111827; 
+            --text-secondary: #4b5563;
+            --accent-blue: #2563eb;
+            --accent-green: #059669;
+            --accent-yellow: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-orange: #ea580c;
+            --accent-red: #dc2626;
+            --border-color: rgba(0, 0, 0, 0.12);
+            --item-bg: #f9fafb;
+            --item-border: #e5e7eb;
+            --input-bg: #f9fafb;
+            --input-border: #d1d5db;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --item-bg: #111827;
+            --item-border: #374151;
+            --input-bg: #111827;
+            --input-border: #4b5563;
         }
         
         body { 
             background-color: var(--bg-color); 
             color: var(--text-main); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 12px; 
+            padding: 10px; 
             margin: 0; 
-            font-size: 1.3rem; 
+            font-size: 1.1rem; 
             -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        body.night-mode {
-            --bg-color: #04060b;
-            --card-bg: rgba(0, 0, 0, 0.5);
-        }
-
-        .dashboard-container {
-            max-width: 700px;
+        .dashboard-grid {
+            max-width: 1300px;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
             gap: 12px;
         }
-
-        .top-header { 
-            background: var(--card-bg); 
-            padding: 16px 20px; 
-            border-radius: 16px; 
-            border: 1px solid rgba(255,255,255,0.12); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            backdrop-filter: blur(16px);
-            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-        }
-        
-        .header-left { display: flex; flex-direction: column; gap: 2px; font-size: 1.4rem; font-weight: 800; }
-        .date-part { color: var(--text-main); }
-        .weekday-part { color: var(--accent-blue); font-size: 1.1rem; }
-
-        .header-center { text-align: right; }
-        .clock { font-size: 2.8rem; font-weight: 900; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
-        .ampm { font-size: 1.1rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
         .panel { 
             background: var(--card-bg); 
             padding: 16px 20px; 
             border-radius: 16px; 
-            border: 1px solid rgba(52, 211, 153, 0.25); 
-            backdrop-filter: blur(16px); 
-            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
+        /* 左上：時鐘與倒數 */
+        .clock-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left { display: flex; flex-direction: column; gap: 2px; }
+        .date-part { color: var(--text-main); font-size: 1.45rem; font-weight: 850; }
+        .weekday-part { color: var(--accent-blue); font-size: 1.15rem; font-weight: 700; }
+        .clock-right { text-align: right; }
+        .clock { font-size: 3rem; font-weight: 900; color: var(--accent-yellow); line-height: 1; }
+        .ampm { font-size: 1rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
+
+        /* 右上：天氣 */
         .wx-box { display: flex; align-items: center; justify-content: space-between; }
+        .wx-temp-area { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .wx-temp { font-size: 3.2rem; font-weight: 900; color: var(--accent-yellow); line-height: 1; }
 
         @keyframes warningBlink {
@@ -76,11 +97,11 @@
             50% { opacity: 0.5; transform: scale(0.98); }
             100% { opacity: 1; transform: scale(1); }
         }
-        .warning-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .warning-container { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         .warning-badge {
-            background: rgba(248, 113, 113, 0.25);
+            background: rgba(239, 68, 68, 0.15);
             color: var(--accent-red);
-            border: 1px solid rgba(248, 113, 113, 0.6);
+            border: 1px solid rgba(239, 68, 68, 0.3);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 1.1rem;
@@ -88,119 +109,159 @@
             animation: warningBlink 1.5s infinite ease-in-out;
         }
 
-        .memo-input-box { display: flex; gap: 8px; margin-bottom: 12px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); padding: 10px 14px; border-radius: 10px; color: #fff; font-size: 1.2rem; outline: none; }
-        .memo-input:focus { border-color: var(--accent-green); box-shadow: 0 0 10px rgba(52,211,153,0.3); }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 18px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
-        
-        .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.35); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: 600; gap: 8px; border: 1px solid rgba(255,255,255,0.08); }
+        /* 主題切換按鈕 */
+        .theme-btn {
+            background: var(--item-bg);
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .theme-btn:hover { background: var(--input-border); }
 
-        .memo-actions { display: flex; gap: 6px; }
-        .memo-action-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
-        .memo-delete { color: #f87171; background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.3rem; padding: 0 4px; }
-        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
-
-        .transit-container { display: flex; flex-direction: column; gap: 10px; }
+        /* 通用元件 */
+        .transit-container { display: flex; flex-direction: column; gap: 8px; }
         .transit-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            border-radius: 12px;
-            padding: 12px 14px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .route-badge {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 900;
             color: var(--accent-yellow);
-            background: rgba(251, 191, 36, 0.2);
-            padding: 2px 10px;
-            border-radius: 6px;
-            border: 1px solid rgba(251, 191, 36, 0.4);
-        }
-
-        .transit-input-box { display: flex; gap: 8px; margin-bottom: 12px; }
-        .transit-input { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; color: #fff; font-size: 1.1rem; outline: none; }
-        .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 16px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; white-space: nowrap; }
-
-        .status-pill {
-            font-size: 0.9rem;
+            background: rgba(245, 158, 11, 0.15);
             padding: 2px 8px;
             border-radius: 6px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .transit-input-box { display: flex; gap: 6px; margin-bottom: 8px; }
+        .transit-input { background: var(--input-bg); border: 1px solid var(--input-border); padding: 6px 10px; border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; }
+        .transit-add-btn { background: var(--accent-blue); color: #ffffff; border: none; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; white-space: nowrap; }
+
+        .status-pill {
+            font-size: 0.85rem;
+            padding: 2px 8px;
+            border-radius: 4px;
             font-weight: bold;
             border: 1px solid transparent;
         }
-        .pill-active-special { background: rgba(251, 191, 36, 0.25); color: var(--accent-yellow); border-color: rgba(251, 191, 36, 0.5); }
-        .pill-active-normal { background: rgba(52, 211, 153, 0.2); color: var(--accent-green); border-color: rgba(52, 211, 153, 0.4); }
+        .pill-active-special { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); border-color: rgba(245, 158, 11, 0.4); }
+
+        /* 港鐵自訂卡片樣式 */
+        .mtr-cell {
+            background: var(--item-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* 備忘錄專用（放大字體） */
+        .memo-input-box { display: flex; gap: 6px; margin-bottom: 6px; }
+        .memo-input { flex: 1; background: var(--input-bg); border: 1px solid var(--input-border); padding: 8px 12px; border-radius: 8px; color: var(--text-main); font-size: 1.1rem; outline: none; }
+        .memo-input:focus { border-color: var(--accent-green); box-shadow: 0 0 6px rgba(16,185,129,0.3); }
+        .memo-btn { background: var(--accent-green); color: #ffffff; border: none; padding: 0 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+        
+        .memo-list { display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto; }
+        .memo-item { background: var(--item-bg); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 1.15rem; font-weight: 650; gap: 6px; border: 1px solid var(--item-border); transition: background-color 0.3s; }
+        .memo-actions { display: flex; gap: 6px; }
+        .memo-action-btn { background: var(--input-border); color: var(--text-main); border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; }
+        .memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+        .refresh-memo-btn { background: var(--item-border); color: var(--text-main); border: 1px solid var(--input-border); padding: 2px 8px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <!-- 頂部：日期時間與假期 -->
-        <div class="top-header">
-            <div class="header-left">
-                <span class="date-part" id="date-part">--</span>
-                <span class="weekday-part" id="weekday-part">--</span>
-            </div>
-            <div class="header-center">
-                <div style="display: flex; align-items: baseline; gap: 8px; justify-content: flex-end;">
-                    <span class="clock" id="clock">00:00:00</span>
-                    <span class="ampm" id="ampm">--</span>
+    <div class="dashboard-grid">
+        <!-- 左上：大時鐘 + 假期倒數 -->
+        <div class="panel">
+            <div class="clock-container">
+                <div class="header-left">
+                    <span class="date-part" id="date-part">--</span>
+                    <span class="weekday-part" id="weekday-part">--</span>
                 </div>
-                <div id="holiday-countdown" style="font-size: 1rem; color: #9ca3af; margin-top: 2px;">計算假期中...</div>
+                <div class="clock-right">
+                    <div style="display: flex; align-items: baseline; gap: 6px; justify-content: flex-end;">
+                        <span class="clock" id="clock">00:00:00</span>
+                        <span class="ampm" id="ampm">--</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                <div id="holiday-countdown" style="font-size: 1.15rem; color: var(--text-secondary); font-weight: 600;">計算假期中...</div>
             </div>
         </div>
 
-        <!-- 天氣 -->
+        <!-- 右上：天氣資訊 + Light/Dark 模式按鈕 -->
         <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: -4px;">
+                <span style="font-size: 0.95rem; color: var(--text-secondary);">天文台實時天氣</span>
+                <button class="theme-btn" id="theme-toggle-btn" onclick="toggleTheme()">🌙 深色模式</button>
+            </div>
             <div class="wx-box">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 64px; height: 64px; display: none;" onerror="this.style.display='none'">
+                <div class="wx-temp-area">
+                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 56px; height: 56px; display: none;" onerror="this.style.display='none'">
                     <span class="wx-temp" id="current-temp">--°C</span>
+                    <!-- 警告訊息放喺溫度隔離 -->
+                    <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
                 </div>
-                <div style="text-align: right; font-size: 1.2rem; font-weight: 600;">
+                <div style="text-align: right; font-size: 1.15rem; font-weight: 600;">
                     <div>最高: <span id="wx-max" style="color: var(--accent-orange);">--°C</span></div>
                     <div>最低: <span id="wx-min" style="color: var(--accent-blue);">--°C</span></div>
                 </div>
             </div>
-            <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
         </div>
 
-        <!-- 九巴 -->
+        <!-- 左下：港鐵恆安站 + 雲端備忘錄 -->
+        <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="transit-container" id="mtr-eta-list">
+                    <div style="color: var(--text-secondary); text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵資料中...</div>
+                </div>
+            </div>
+
+            <!-- 雲端備忘錄 -->
+            <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 1.15rem; font-weight: bold; color: var(--accent-green);">📝 雲端備忘錄</span>
+                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步</button>
+                </div>
+                <div class="memo-input-box">
+                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘..." onkeypress="if(event.key==='Enter')addMemo()">
+                    <button class="memo-btn" onclick="addMemo()">新增</button>
+                </div>
+                <div class="memo-list" id="memo-list">
+                    <div style="color: var(--text-secondary); text-align: center; padding: 4px; font-size: 1.05rem;">正在連接雲端...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右下：九巴實時到站 -->
         <div class="panel">
-            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--accent-yellow);">🚌 九巴實時到站</div>
             <div class="transit-input-box">
-                <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
-                <input type="text" id="bus-stop-input" class="transit-input" style="width: 90px; text-align: center;" placeholder="站ID" value="003345">
+                <input type="text" id="bus-route-input" class="transit-input" style="width: 60px; text-align: center;" placeholder="路線">
+                <input type="text" id="bus-stop-input" class="transit-input" style="width: 80px; text-align: center;" placeholder="站ID" value="003345">
                 <input type="text" id="bus-name-input" class="transit-input" style="flex: 1;" placeholder="自訂名稱">
                 <button class="transit-add-btn" onclick="addBusRoute()">新增</button>
             </div>
-            <div class="transit-container" id="bus-eta-list">
-                <div style="color: #9ca3af; text-align: center; padding: 12px; font-size: 1.1rem;">載入巴士資料中...</div>
-            </div>
-        </div>
-
-        <!-- 港鐵 -->
-        <div class="panel">
-            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--accent-purple);">🚇 港鐵恆安站</div>
-            <div class="transit-container" id="mtr-eta-list">
-                <div style="color: #9ca3af; text-align: center; padding: 12px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
-            </div>
-        </div>
-
-        <!-- 雲端備忘錄 -->
-        <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-size: 1.2rem; font-weight: bold; color: var(--accent-green);">📝 雲端備忘錄</span>
-                <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步</button>
-            </div>
-            <div class="memo-input-box">
-                <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘..." onkeypress="if(event.key==='Enter')addMemo()">
-                <button class="memo-btn" onclick="addMemo()">新增</button>
-            </div>
-            <div class="memo-list" id="memo-list">
-                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">正在連接雲端...</div>
+            <div class="transit-container" id="bus-eta-list" style="max-height: 250px; overflow-y: auto;">
+                <div style="color: var(--text-secondary); text-align: center; padding: 10px; font-size: 1.1rem;">載入巴士資料中...</div>
             </div>
         </div>
     </div>
@@ -208,6 +269,31 @@
     <script>
         const BIN_ID = "6a87123ada38895dfefbc1ca"; 
         const MASTER_KEY = "$2a$10$HvcOoQBCbmfplG2XSkexuOAFTbJfJzpuucJSOImKmhiM3K//7f5kO";
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('dashboard_theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle-btn').innerHTML = '☀️ 淺色模式';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('theme-toggle-btn').innerHTML = '🌙 深色模式';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const btn = document.getElementById('theme-toggle-btn');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('dashboard_theme', 'light');
+                btn.innerHTML = '🌙 深色模式';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('dashboard_theme', 'dark');
+                btn.innerHTML = '☀️ 淺色模式';
+            }
+        }
 
         const hkHolidays = [
             { name: "中秋節翌日", date: "2026-09-28" },
@@ -231,13 +317,6 @@
             document.getElementById('ampm').textContent = ampm;
             document.getElementById('date-part').textContent = now.toLocaleDateString('zh-HK', {month:'long', day:'numeric'});
             document.getElementById('weekday-part').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
-
-            const currentHour = now.getHours();
-            if (currentHour >= 19 || currentHour < 6) {
-                document.body.classList.add('night-mode');
-            } else {
-                document.body.classList.remove('night-mode');
-            }
         }
 
         function updateHolidayCountdown() {
@@ -328,7 +407,7 @@
                 if (json.status === 1 && json.data) {
                     const stationData = json.data['TML-HEO'];
                     if (!stationData) {
-                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 8px;">暫無列車資料</div>';
+                        container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 10px;">暫無列車資料</div>';
                         return;
                     }
 
@@ -336,10 +415,12 @@
                     const upTrains = (stationData.UP || []).slice(0, 2);
                     const destMap = { 'WKS': '烏溪沙', 'MOS': '馬鞍山', 'TUM': '屯門', 'HUH': '紅磡' };
 
-                    let gridHtml = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">';
+                    let gridHtml = '<div style="display: flex; flex-direction: column; gap: 6px;">';
                     for (let i = 0; i < 2; i++) {
+                        gridHtml += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">`;
                         gridHtml += renderMtrCell(downTrains[i], '屯門', destMap);
                         gridHtml += renderMtrCell(upTrains[i], '烏溪沙', destMap);
+                        gridHtml += `</div>`;
                     }
                     gridHtml += '</div>';
                     
@@ -350,23 +431,20 @@
 
         function renderMtrCell(t, defaultDestName, destMap) {
             if (!t) {
-                return `<div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; font-size: 1rem; color: #6b7280; text-align: center; display: flex; align-items: center; justify-content: center;">暫無班次</div>`;
+                return `<div class="mtr-cell" style="color: var(--text-secondary); justify-content: center;">暫無班次</div>`;
             }
             const destName = destMap[t.dest] || t.dest || defaultDestName;
             const trainTime = new Date(t.time.replace(/-/g, '/'));
             const diffMin = Math.round((trainTime - new Date()) / 60000);
             const clockTime = `${String(trainTime.getHours()).padStart(2, '0')}:${String(trainTime.getMinutes()).padStart(2, '0')}`;
-            const timeText = diffMin <= 0 ? '即到' : `${diffMin}分`;
-            const destColor = (t.dest === 'WKS') ? 'var(--accent-blue)' : 'var(--accent-purple)';
+            const timeText = diffMin <= 0 ? '即到' : `${diffMin}分鐘`;
 
             return `
-                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(192,132,252,0.3); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="font-size: 0.95rem; color: #9ca3af;">
-                        ${t.plat}台 <span style="color: ${destColor}; font-weight: bold;">${destName}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px;">
-                        <span style="color: var(--accent-green); font-weight: 900; font-size: 1.3rem;">${timeText}</span>
-                        <span style="color: var(--accent-yellow); font-weight: bold; font-size: 1.1rem;">${clockTime}</span>
+                <div class="mtr-cell">
+                    <span style="color: var(--accent-purple);">${destName}</span>
+                    <div style="display: flex; gap: 10px;">
+                        <span style="color: var(--accent-green);">${timeText}</span>
+                        <span style="color: var(--accent-yellow);">${clockTime}</span>
                     </div>
                 </div>
             `;
@@ -413,35 +491,33 @@
                         const timeStr = diffMin <= 1 ? '將到' : `${diffMin}分鐘`;
                         const clockTime = `${String(nextTime.getHours()).padStart(2, '0')}:${String(nextTime.getMinutes()).padStart(2, '0')}`;
 
-                        const rmkText = (e.rmk_tc || '').trim();
-                        const isSpecial = (e.service_type && e.service_type > 1) || (rmkText !== '');
-                        
-                        // 原定班次綠色，特別班次黃色
-                        const timeColor = isSpecial ? 'var(--accent-yellow)' : 'var(--accent-green)';
-                        
-                        // 標籤顯示內容與對應顏色
-                        const tagText = rmkText || (isSpecial ? '特別班次' : '普通');
-                        const tagClass = isSpecial ? 'pill-active-special' : 'pill-active-normal';
+                        const rmkText = e.rmk_tc || '';
+                        const isSpecial = (e.service_type && e.service_type > 1) || (rmkText.includes('特別') || rmkText.includes('特班'));
+
+                        // 只在特別班次時顯示一個標籤，普通班次保持乾淨不顯示多餘掣
+                        const specialTagHtml = isSpecial 
+                            ? `<span class="status-pill pill-active-special">特別班次</span>` 
+                            : '';
 
                         return `
-                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
-                                <span style="color: #9ca3af;">${idx + 1}: <strong style="color: ${timeColor}; font-size: 1.2rem;">${timeStr}</strong> <span style="font-size: 1rem;">(${clockTime})</span></span>
-                                <div><span class="status-pill ${tagClass}">${tagText}</span></div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1rem; margin-top: 5px; border-top: 1px solid var(--border-color); padding-top: 5px;">
+                                <span style="color: var(--text-secondary);">${idx + 1}: <strong style="color: var(--accent-green); font-size: 1.1rem;">${timeStr}</strong> <span style="font-size: 0.9rem;">(${clockTime})</span></span>
+                                <div>${specialTagHtml}</div>
                             </div>
                         `;
                     }).join('');
                 } else {
-                    etasListHtml = '<div style="color: #9ca3af; font-size: 1.1rem; margin-top: 6px;">暫無班次</div>';
+                    etasListHtml = '<div style="color: var(--text-secondary); font-size: 1rem; margin-top: 4px;">暫無班次</div>';
                 }
 
                 htmlContent += `
                     <div class="transit-card">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
                                 <span class="route-badge">${r.route}</span>
-                                ${r.name ? `<span style="font-size: 1.1rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
+                                ${r.name ? `<span style="font-size: 1.05rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
                             </div>
-                            <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:bold; font-size:1.3rem;">✕</button>
+                            <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-weight:bold; font-size:1.1rem;">✕</button>
                         </div>
                         <div>${etasListHtml}</div>
                     </div>
@@ -501,7 +577,7 @@
         function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
             if (memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">目前沒有備忘</div>';
+                listEl.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 4px; font-size: 1.05rem;">目前沒有備忘</div>';
                 return;
             }
             listEl.innerHTML = memos.map((text, index) => `
@@ -545,18 +621,19 @@
             await saveMemosToCloud(memos);
         }
 
-        setInterval(updateTime, 1000);
-        setInterval(fetchWeather, 600000); 
-        setInterval(loadMemosFromCloud, 30000); 
-        setInterval(fetchMTR, 30000);
-        setInterval(fetchBusETA, 30000);
-
+        initTheme();
         updateTime(); 
         updateHolidayCountdown();
         fetchWeather();
         loadMemosFromCloud(); 
         fetchMTR();
         fetchBusETA();
+
+        setInterval(updateTime, 1000);
+        setInterval(fetchWeather, 600000); 
+        setInterval(loadMemosFromCloud, 30000); 
+        setInterval(fetchMTR, 30000);
+        setInterval(fetchBusETA, 30000);
     </script>
 </body>
 </html>
