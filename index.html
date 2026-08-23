@@ -2,7 +2,7 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>星空個人 Dashboard</title>
+    <title>3008 Tablet Dashboard - Big View</title>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -13,204 +13,209 @@
             --accent-yellow: #fbbf24;
             --accent-purple: #c084fc;
             --accent-orange: #f59e0b;
+            --accent-red: #f87171;
         }
         
         body { 
             background-color: var(--bg-color); 
             color: var(--text-main); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 8px; 
+            padding: 12px; 
             margin: 0; 
-            font-size: 1.15rem;
+            font-size: 1.3rem; 
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.night-mode {
+            --bg-color: #04060b;
+            --card-bg: rgba(0, 0, 0, 0.5);
+        }
+
+        .dashboard-container {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .top-header { 
             background: var(--card-bg); 
-            padding: 12px 18px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            max-width: 1200px; 
-            margin: 0 auto 8px auto; 
-            display: grid; 
-            grid-template-columns: 1.5fr 1.5fr 0.5fr; 
+            padding: 16px 20px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.12); 
+            display: flex; 
+            justify-content: space-between; 
             align-items: center; 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
         }
         
-        .header-left { display: flex; align-items: baseline; gap: 10px; font-size: 2.2rem; font-weight: 800; }
+        .header-left { display: flex; flex-direction: column; gap: 2px; font-size: 1.4rem; font-weight: 800; }
         .date-part { color: var(--text-main); }
-        .weekday-part { color: var(--accent-blue); }
+        .weekday-part { color: var(--accent-blue); font-size: 1.1rem; }
 
-        .header-center { text-align: center; display: flex; align-items: baseline; justify-content: center; gap: 6px; }
-        .clock { font-size: 2.2rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
+        .header-center { text-align: right; }
+        .clock { font-size: 2.8rem; font-weight: 900; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
         .ampm { font-size: 1.1rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
-        .header-right { display: flex; align-items: center; justify-content: flex-end; }
-
-        .realistic-moon {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #e5e7eb 0%, #9ca3af 40%, #1f2937 70%, #030712 100%);
-            box-shadow: inset -8px -4px 12px rgba(0, 0, 0, 0.9), 0 0 10px rgba(192, 132, 252, 0.3);
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .moon-shadow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 50%;
-            transition: transform 0.5s ease;
-            transform-origin: center;
-        }
-
-        .main-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8px; max-width: 1200px; margin: auto; }
         .panel { 
             background: var(--card-bg); 
-            padding: 12px 16px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            backdrop-filter: blur(10px);
-            margin-bottom: 8px;
+            padding: 16px 20px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(52, 211, 153, 0.25); 
+            backdrop-filter: blur(16px); 
+            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
         }
-        .panel-title { 
-            font-size: 1.2rem; color: var(--accent-green); font-weight: 700; margin-bottom: 10px; 
-            border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; 
-            display: flex; justify-content: space-between; align-items: center; 
-        }
-        
-        .wx-temp-box { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
-        .wx-temp { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
-        .forecast-container { margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
-        .forecast-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 600; }
 
-        .transport-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin: 6px 0; border-radius: 10px; font-weight: 700; font-size: 1.1rem; background: rgba(255,255,255,0.05); }
-        .mtr-up { border-left: 6px solid var(--accent-blue); }
-        .mtr-down { border-left: 6px solid var(--accent-purple); }
-        .bus-normal { border-left: 6px solid var(--accent-green); }
-        .bus-special { border-left: 6px solid var(--accent-orange); background: rgba(245, 158, 11, 0.12); }
+        .wx-box { display: flex; align-items: center; justify-content: space-between; }
+        .wx-temp { font-size: 3.2rem; font-weight: 900; color: var(--accent-yellow); line-height: 1; }
+
+        @keyframes warningBlink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .warning-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .warning-badge {
+            background: rgba(248, 113, 113, 0.25);
+            color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.6);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            animation: warningBlink 1.5s infinite ease-in-out;
+        }
+
+        .memo-input-box { display: flex; gap: 8px; margin-bottom: 12px; }
+        .memo-input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); padding: 10px 14px; border-radius: 10px; color: #fff; font-size: 1.2rem; outline: none; }
+        .memo-input:focus { border-color: var(--accent-green); box-shadow: 0 0 10px rgba(52,211,153,0.3); }
+        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 18px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
         
-        .time-val { color: var(--accent-green); font-size: 1.05rem; font-weight: 800; text-align: right; }
-        .sub-note { font-size: 0.85rem; color: #9ca3af; font-weight: normal; display: block; }
-        
-        .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 1.15rem; outline: none; }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        
-        .memo-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 600; gap: 8px; }
-        .memo-actions { display: flex; gap: 4px; }
-        .memo-action-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-        .memo-action-btn:hover { background: rgba(255,255,255,0.2); }
-        .memo-delete { color: #f87171; background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; padding: 2px 4px; }
-        
-        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+        .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+        .memo-item { background: rgba(0,0,0,0.35); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; font-weight: 600; gap: 8px; border: 1px solid rgba(255,255,255,0.08); }
+
+        .memo-actions { display: flex; gap: 6px; }
+        .memo-action-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .memo-delete { color: #f87171; background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.3rem; padding: 0 4px; }
+        .refresh-memo-btn { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+
+        .transit-container { display: flex; flex-direction: column; gap: 10px; }
+        .transit-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .route-badge {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--accent-yellow);
+            background: rgba(251, 191, 36, 0.2);
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+
+        .transit-input-box { display: flex; gap: 8px; margin-bottom: 12px; }
+        .transit-input { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; color: #fff; font-size: 1.1rem; outline: none; }
+        .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 16px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; white-space: nowrap; }
+
+        .status-pill {
+            font-size: 0.9rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: 1px solid transparent;
+        }
+        .pill-active-special { background: rgba(251, 191, 36, 0.25); color: var(--accent-yellow); border-color: rgba(251, 191, 36, 0.5); }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="header-left">
-            <span class="date-part" id="date-part">--</span>
-            <span class="weekday-part" id="weekday-part">--</span>
-        </div>
-
-        <div class="header-center">
-            <span class="clock" id="clock">00:00:00</span>
-            <span class="ampm" id="ampm">--</span>
-        </div>
-
-        <div class="header-right">
-            <div class="realistic-moon" title="即時月相">
-                <div class="moon-shadow" id="moon-shadow"></div>
+    <div class="dashboard-container">
+        <!-- 頂部：日期時間與假期 -->
+        <div class="top-header">
+            <div class="header-left">
+                <span class="date-part" id="date-part">--</span>
+                <span class="weekday-part" id="weekday-part">--</span>
+            </div>
+            <div class="header-center">
+                <div style="display: flex; align-items: baseline; gap: 8px; justify-content: flex-end;">
+                    <span class="clock" id="clock">00:00:00</span>
+                    <span class="ampm" id="ampm">--</span>
+                </div>
+                <div id="holiday-countdown" style="font-size: 1rem; color: #9ca3af; margin-top: 2px;">計算假期中...</div>
             </div>
         </div>
-    </div>
 
-    <div class="main-grid">
-        <div>
-            <div class="panel">
-                <div class="panel-title"><span>☀️ 香港天文台 (沙田實況)</span></div>
-                <div class="wx-temp-box">
+        <!-- 天氣 -->
+        <div class="panel">
+            <div class="wx-box">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 64px; height: 64px; display: none;" onerror="this.style.display='none'">
                     <span class="wx-temp" id="current-temp">--°C</span>
-                    <span style="font-size: 2.2rem;">⛅</span>
                 </div>
-                <div style="margin-top: 4px; font-size: 1rem;">狀況: <span id="current-desc" style="color:var(--accent-blue); font-weight:700;">連線中...</span></div>
-                
-                <div class="forecast-container">
-                    <div style="font-size: 0.95rem; color: var(--accent-green); font-weight: 700;">🔮 天文台明日預報</div>
-                    <div class="forecast-row"><span id="fc-date-1">--</span><span id="fc-wx-1">讀取中...</span></div>
+                <div style="text-align: right; font-size: 1.2rem; font-weight: 600;">
+                    <div>最高: <span id="wx-max" style="color: var(--accent-orange);">--°C</span></div>
+                    <div>最低: <span id="wx-min" style="color: var(--accent-blue);">--°C</span></div>
                 </div>
             </div>
+            <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
+        </div>
 
-            <div class="panel">
-                <div class="panel-title">
-                    <span>📝 雲端備忘錄</span>
-                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步</button>
-                </div>
-
-                <div class="memo-input-box">
-                    <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘..." onkeypress="if(event.key==='Enter')addMemo()">
-                    <button class="memo-btn" onclick="addMemo()">新增</button>
-                </div>
-
-                <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1rem;">正在連接雲端...</div>
-                </div>
+        <!-- 九巴 -->
+        <div class="panel">
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--accent-yellow);">🚌 九巴實時到站</div>
+            <div class="transit-input-box">
+                <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
+                <input type="text" id="bus-stop-input" class="transit-input" style="width: 90px; text-align: center;" placeholder="站ID" value="003345">
+                <input type="text" id="bus-name-input" class="transit-input" style="flex: 1;" placeholder="自訂名稱">
+                <button class="transit-add-btn" onclick="addBusRoute()">新增</button>
+            </div>
+            <div class="transit-container" id="bus-eta-list">
+                <div style="color: #9ca3af; text-align: center; padding: 12px; font-size: 1.1rem;">載入巴士資料中...</div>
             </div>
         </div>
 
-        <div>
-            <div class="panel">
-                <div class="panel-title">🚇 港鐵恆安站 (屯馬線)</div>
-                
-                <div class="transport-row mtr-up">
-                    <div>往 烏溪沙<span class="sub-note">港鐵官方實時</span></div>
-                    <span class="time-val" id="mtr-up">連線中...</span>
-                </div>
-                
-                <div class="transport-row mtr-down">
-                    <div>往 屯門<span class="sub-note">港鐵官方實時</span></div>
-                    <span class="time-val" id="mtr-down">連線中...</span>
-                </div>
+        <!-- 港鐵 -->
+        <div class="panel">
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; color: var(--accent-purple);">🚇 港鐵恆安站</div>
+            <div class="transit-container" id="mtr-eta-list">
+                <div style="color: #9ca3af; text-align: center; padding: 12px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
             </div>
+        </div>
 
-            <div class="panel">
-                <div class="panel-title">🚌 官方實時巴士 (89C)</div>
-                
-                <div class="transport-row bus-special">
-                    <div>🔥 欣安邨 - 89C [特別班次]<span class="sub-note">往觀塘 (九巴官方API)</span></div>
-                    <span class="time-val" style="color: var(--accent-orange);" id="hin-special">連線中...</span>
-                </div>
-
-                <div class="transport-row bus-special" style="border-left-color: #f97316; background: rgba(249, 115, 22, 0.08);">
-                    <div>🔥 錦鞍苑 - 89C [特別班次]<span class="sub-note">往觀塘 (九巴官方API)</span></div>
-                    <span class="time-val" style="color: var(--accent-orange);" id="k-special">連線中...</span>
-                </div>
-
-                <div class="transport-row bus-normal">
-                    <div>錦鞍苑 - 89C<span class="sub-note">往觀塘 (普通班次)</span></div>
-                    <span class="time-val" id="k-89c">連線中...</span>
-                </div>
-
-                <div class="transport-row bus-normal" style="border-left-color: #38bdf8;">
-                    <div>欣安邨 - 89C<span class="sub-note">往觀塘 (普通班次)</span></div>
-                    <span class="time-val" id="hin-89c">連線中...</span>
-                </div>
+        <!-- 雲端備忘錄 -->
+        <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 1.2rem; font-weight: bold; color: var(--accent-green);">📝 雲端備忘錄</span>
+                <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步</button>
+            </div>
+            <div class="memo-input-box">
+                <input type="text" id="memo-input" class="memo-input" placeholder="輸入備忘..." onkeypress="if(event.key==='Enter')addMemo()">
+                <button class="memo-btn" onclick="addMemo()">新增</button>
+            </div>
+            <div class="memo-list" id="memo-list">
+                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">正在連接雲端...</div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.14/lunar.js"></script>
 
     <script>
         const BIN_ID = "6a87123ada38895dfefbc1ca"; 
         const MASTER_KEY = "$2a$10$HvcOoQBCbmfplG2XSkexuOAFTbJfJzpuucJSOImKmhiM3K//7f5kO";
+
+        const hkHolidays = [
+            { name: "中秋節翌日", date: "2026-09-28" },
+            { name: "國慶日", date: "2026-10-01" },
+            { name: "重陽節", date: "2026-10-23" },
+            { name: "聖誕節", date: "2026-12-25" },
+            { name: "元旦", date: "2027-01-01" },
+            { name: "農曆年初一", date: "2027-02-06" }
+        ];
 
         function updateTime() {
             const now = new Date();
@@ -218,179 +223,259 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
+            hours = hours % 12; hours = hours ? hours : 12;
             const hoursStr = String(hours).padStart(2, '0');
 
             document.getElementById('clock').textContent = `${hoursStr}:${minutes}:${seconds}`;
             document.getElementById('ampm').textContent = ampm;
-
             document.getElementById('date-part').textContent = now.toLocaleDateString('zh-HK', {month:'long', day:'numeric'});
             document.getElementById('weekday-part').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
 
-            try {
-                const solar = Solar.fromDate(now);
-                const lunar = solar.getLunar();
-                const lunarDay = lunar.getDay();
-                let shadowTransform = 'translateX(0%)';
-
-                if (lunarDay === 1) shadowTransform = 'translateX(0%)';
-                else if (lunarDay > 1 && lunarDay < 7) shadowTransform = 'translateX(35%)';
-                else if (lunarDay === 7 || lunarDay === 8) shadowTransform = 'translateX(50%)';
-                else if (lunarDay > 8 && lunarDay < 15) shadowTransform = 'translateX(75%)';
-                else if (lunarDay === 15 || lunarDay === 16) shadowTransform = 'translateX(100%)';
-                else if (lunarDay > 16 && lunarDay < 22) shadowTransform = 'translateX(-75%)';
-                else if (lunarDay === 22 || lunarDay === 23) shadowTransform = 'translateX(-50%)';
-                else shadowTransform = 'translateX(-35%)';
-
-                document.getElementById('moon-shadow').style.transform = shadowTransform;
-            } catch (e) {}
-        }
-
-        async function fetchMTR() {
-            try {
-                const targetUrl = 'https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=MOS&sta=HET';
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
-                const wrapper = await res.json();
-                const data = JSON.parse(wrapper.contents);
-
-                if (data && data.status === 1 && data.data && data.data['HET']) {
-                    const hetData = data.data['HET'];
-                    parseMTRDirection(hetData.UP, 'mtr-up');
-                    parseMTRDirection(hetData.DOWN, 'mtr-down');
-                } else {
-                    document.getElementById('mtr-up').textContent = '暫無資料';
-                    document.getElementById('mtr-down').textContent = '暫無資料';
-                }
-            } catch (e) {
-                document.getElementById('mtr-up').textContent = '暫時無法連接';
-                document.getElementById('mtr-down').textContent = '暫時無法連接';
+            const currentHour = now.getHours();
+            if (currentHour >= 19 || currentHour < 6) {
+                document.body.classList.add('night-mode');
+            } else {
+                document.body.classList.remove('night-mode');
             }
         }
 
-        function parseMTRDirection(directionObj, elementId) {
-            if (!directionObj || !directionObj.trains || directionObj.trains.length === 0) {
-                document.getElementById(elementId).textContent = '暫無班次';
-                return;
+        function updateHolidayCountdown() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const upcoming = hkHolidays.map(h => {
+                const hDate = new Date(h.date);
+                hDate.setHours(0, 0, 0, 0);
+                const diffDays = Math.round((hDate - today) / (1000 * 60 * 60 * 24));
+                return { ...h, diffDays };
+            }).filter(h => h.diffDays >= 0);
+            
+            upcoming.sort((a, b) => a.diffDays - b.diffDays);
+            
+            const el = document.getElementById('holiday-countdown');
+            if (upcoming.length > 0) {
+                const next = upcoming[0];
+                let timeText = next.diffDays === 0 ? '就是今天！' : `${next.diffDays} 日後`;
+                el.innerHTML = `最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span> (${timeText})`;
+            } else {
+                el.innerHTML = `暫無近期假期資料`;
             }
-
-            let times = [];
-            directionObj.trains.forEach(train => {
-                if (train.time) {
-                    let arrivalTime = new Date(train.time.replace(/-/g, '/'));
-                    let now = new Date();
-                    let diffMin = Math.round((arrivalTime - now) / 60000);
-                    
-                    let hh = String(arrivalTime.getHours()).padStart(2, '0');
-                    let mm = String(arrivalTime.getMinutes()).padStart(2, '0');
-                    let timeFormatted = `${hh}:${mm}`;
-
-                    if (diffMin <= 0) {
-                        times.push(`將至 (${timeFormatted})`);
-                    } else {
-                        times.push(`${diffMin}分鐘 (${timeFormatted})`);
-                    }
-                }
-            });
-
-            document.getElementById(elementId).textContent = times.length > 0 ? times.slice(0, 2).join(' | ') : '--';
         }
 
         async function fetchWeather() {
             try {
                 const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
                 const tempData = await tempRes.json();
-                if (tempData && tempData.temperature && tempData.temperature.data) {
-                    const shatin = tempData.temperature.data.find(item => item.place === "沙田");
-                    if (shatin) {
-                        document.getElementById('current-temp').textContent = shatin.value + '°C';
-                    }
+                if (tempData?.temperature?.data) {
+                    const shatin = tempData.temperature.data.find(i => i.place === "沙田");
+                    if (shatin) document.getElementById('current-temp').textContent = shatin.value + '°C';
+                }
+                if (tempData?.icon && tempData.icon.length > 0) {
+                    const iconCode = tempData.icon[0];
+                    const iconImg = document.getElementById('wx-icon-img');
+                    iconImg.src = `https://www.hko.gov.hk/images/wxicon/pic${iconCode}.png`;
+                    iconImg.style.display = 'block';
                 }
 
-                const forecastRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
-                const forecastData = await forecastRes.json();
-                if (forecastData && forecastData.weatherForecast && forecastData.weatherForecast.length > 0) {
-                    let f = forecastData.weatherForecast[0];
-                    let fDateStr = f.forecastDate;
-                    let month = parseInt(fDateStr.substring(4, 6));
-                    let day = parseInt(fDateStr.substring(6, 8));
-                    
-                    document.getElementById('fc-date-1').textContent = `${month}月${day}日`;
-                    document.getElementById('fc-wx-1').textContent = `${f.forecastWeather} (${f.forecastMintemp.value}°C - ${f.forecastMaxtemp.value}°C)`;
-                    document.getElementById('current-desc').textContent = forecastData.generalSituation || '香港天文台實況正常';
+                const fRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+                const fData = await fRes.json();
+                if (fData?.weatherForecast?.length > 0) {
+                    const nowStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+                    let todayFc = fData.weatherForecast.find(f => f.forecastDate === nowStr) || fData.weatherForecast[0];
+                    if (todayFc) {
+                        document.getElementById('wx-max').textContent = todayFc.forecastMaxtemp.value + '°C';
+                        document.getElementById('wx-min').textContent = todayFc.forecastMintemp.value + '°C';
+                    }
                 }
-            } catch (e) {
-                document.getElementById('current-temp').textContent = '--°C';
-                document.getElementById('current-desc').textContent = '天文台 API 未能連線';
+            } catch (e) {}
+            fetchWeatherWarnings();
+        }
+
+        async function fetchWeatherWarnings() {
+            const warningBox = document.getElementById('weather-warning-box');
+            try {
+                const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+                if (res.ok) {
+                    const data = await res.json();
+                    let warningHtml = '';
+                    for (const key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            const warnItem = data[key];
+                            if (warnItem && warnItem.name) {
+                                warningHtml += `<span class="warning-badge">⚠️ ${warnItem.name}</span>`;
+                            }
+                        }
+                    }
+                    if (warningHtml !== '') {
+                        warningBox.innerHTML = warningHtml;
+                        warningBox.style.display = 'flex';
+                    } else {
+                        warningBox.innerHTML = '';
+                        warningBox.style.display = 'none';
+                    }
+                }
+            } catch (err) {
+                warningBox.style.display = 'none';
             }
+        }
+
+        async function fetchMTR() {
+            const container = document.getElementById('mtr-eta-list');
+            try {
+                const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=TML&sta=HEO');
+                const json = await res.json();
+                if (json.status === 1 && json.data) {
+                    const stationData = json.data['TML-HEO'];
+                    if (!stationData) {
+                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 8px;">暫無列車資料</div>';
+                        return;
+                    }
+
+                    const downTrains = (stationData.DOWN || []).slice(0, 2);
+                    const upTrains = (stationData.UP || []).slice(0, 2);
+                    const destMap = { 'WKS': '烏溪沙', 'MOS': '馬鞍山', 'TUM': '屯門', 'HUH': '紅磡' };
+
+                    let gridHtml = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">';
+                    for (let i = 0; i < 2; i++) {
+                        gridHtml += renderMtrCell(downTrains[i], '屯門', destMap);
+                        gridHtml += renderMtrCell(upTrains[i], '烏溪沙', destMap);
+                    }
+                    gridHtml += '</div>';
+                    
+                    container.innerHTML = gridHtml;
+                }
+            } catch (e) {}
+        }
+
+        function renderMtrCell(t, defaultDestName, destMap) {
+            if (!t) {
+                return `<div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; font-size: 1rem; color: #6b7280; text-align: center; display: flex; align-items: center; justify-content: center;">暫無班次</div>`;
+            }
+            const destName = destMap[t.dest] || t.dest || defaultDestName;
+            const trainTime = new Date(t.time.replace(/-/g, '/'));
+            const diffMin = Math.round((trainTime - new Date()) / 60000);
+            const clockTime = `${String(trainTime.getHours()).padStart(2, '0')}:${String(trainTime.getMinutes()).padStart(2, '0')}`;
+            const timeText = diffMin <= 0 ? '即到' : `${diffMin}分`;
+            const destColor = (t.dest === 'WKS') ? 'var(--accent-blue)' : 'var(--accent-purple)';
+
+            return `
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(192,132,252,0.3); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="font-size: 0.95rem; color: #9ca3af;">
+                        ${t.plat}台 <span style="color: ${destColor}; font-weight: bold;">${destName}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px;">
+                        <span style="color: var(--accent-green); font-weight: 900; font-size: 1.3rem;">${timeText}</span>
+                        <span style="color: var(--accent-yellow); font-weight: bold; font-size: 1.1rem;">${clockTime}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStoredBusRoutes() {
+            const saved = localStorage.getItem('custom_bus_routes_v2');
+            if (saved) {
+                try { return JSON.parse(saved); } catch (e) {}
+            }
+            return [
+                { route: '85K', stop: '003345', name: '錦鞍苑往沙田' },
+                { route: '681', stop: '003345', name: '錦鞍苑往港島' }
+            ];
         }
 
         async function fetchBusETA() {
-            try {
-                const targetUrl = 'https://data.etabus.gov.hk/v1/transport/kmb/eta/route/89C';
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
-                const wrapper = await res.json();
-                const data = JSON.parse(wrapper.contents);
+            const container = document.getElementById('bus-eta-list');
+            const routes = getStoredBusRoutes();
 
-                if (data && data.data) {
-                    const etas = data.data;
-                    let kamOnEtas = etas.filter(e => e.stop === "MA321" && e.dir === "O");
-                    let yanOnEtas = etas.filter(e => e.stop === "MA140" && e.dir === "O");
-
-                    formatAndDisplayETA(kamOnEtas, 'k-89c', 'k-special');
-                    formatAndDisplayETA(yanOnEtas, 'hin-89c', 'hin-special');
-                }
-            } catch (e) {
-                document.getElementById('k-89c').textContent = '暫時無法連接';
-                document.getElementById('hin-89c').textContent = '暫時無法連接';
-            }
-        }
-
-        function formatAndDisplayETA(stationEtas, normalId, specialId) {
-            if (!stationEtas || stationEtas.length === 0) {
-                document.getElementById(normalId).textContent = '暫無班次';
-                document.getElementById(specialId).textContent = '非服務時間';
-                return;
-            }
-
-            let normalList = [];
-            let specialList = [];
-
-            stationEtas.forEach(eta => {
-                let timeStr = formatArrivalTime(eta.eta);
-                if (timeStr) {
-                    if (eta.rmk_tc && (eta.rmk_tc.includes('特別') || eta.rmk_tc.includes('特快'))) {
-                        specialList.push(timeStr);
-                    } else {
-                        normalList.push(timeStr);
+            let htmlContent = '';
+            for (let i = 0; i < routes.length; i++) {
+                let r = routes[i];
+                let etas = [];
+                try {
+                    for (let st = 1; st <= 2; st++) {
+                        const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stop}/${r.route}/${st}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data?.data) {
+                                etas = etas.concat(Array.isArray(data.data) ? data.data : [data.data]);
+                            }
+                        }
                     }
-                }
-            });
+                } catch (err) {}
 
-            document.getElementById(normalId).textContent = normalList.length > 0 ? normalList.join(', ') : '--';
-            document.getElementById(specialId).textContent = specialList.length > 0 ? specialList.join(', ') : '非服務時間';
+                let etasListHtml = '';
+                const validEtas = etas.filter(e => e.eta).sort((a, b) => new Date(a.eta) - new Date(b.eta));
+                if (validEtas.length > 0) {
+                    const topEtas = validEtas.slice(0, 3);
+                    etasListHtml = topEtas.map((e, idx) => {
+                        const nextTime = new Date(e.eta);
+                        const diffMin = Math.round((nextTime - new Date()) / 60000);
+                        const timeStr = diffMin <= 1 ? '將到' : `${diffMin}分鐘`;
+                        const clockTime = `${String(nextTime.getHours()).padStart(2, '0')}:${String(nextTime.getMinutes()).padStart(2, '0')}`;
+
+                        const rmkText = (e.rmk_tc || '').trim();
+                        const isSpecial = (e.service_type && e.service_type > 1) || (rmkText !== '');
+                        
+                        // 原定班次綠色，特別班次黃色
+                        const timeColor = isSpecial ? 'var(--accent-yellow)' : 'var(--accent-green)';
+                        const remarkTagHtml = isSpecial ? `<span class="status-pill pill-active-special">${rmkText || '特別班次'}</span>` : '';
+
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
+                                <span style="color: #9ca3af;">${idx + 1}: <strong style="color: ${timeColor}; font-size: 1.2rem;">${timeStr}</strong> <span style="font-size: 1rem;">(${clockTime})</span></span>
+                                <div>${remarkTagHtml}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    etasListHtml = '<div style="color: #9ca3af; font-size: 1.1rem; margin-top: 6px;">暫無班次</div>';
+                }
+
+                htmlContent += `
+                    <div class="transit-card">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="route-badge">${r.route}</span>
+                                ${r.name ? `<span style="font-size: 1.1rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
+                            </div>
+                            <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:#f87171; cursor:pointer; font-weight:bold; font-size:1.3rem;">✕</button>
+                        </div>
+                        <div>${etasListHtml}</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = htmlContent;
         }
 
-        function formatArrivalTime(etaString) {
-            if (!etaString) return null;
-            const arrival = new Date(etaString);
-            const now = new Date();
-            const diffMin = Math.round((arrival - now) / 60000);
-            if (diffMin <= 0) return '將至';
-            return `${diffMin}分鐘`;
+        function addBusRoute() {
+            const routeInput = document.getElementById('bus-route-input');
+            const stopInput = document.getElementById('bus-stop-input');
+            const nameInput = document.getElementById('bus-name-input');
+            
+            const routeVal = routeInput.value.trim().toUpperCase();
+            if (!routeVal) return;
+            let routes = getStoredBusRoutes();
+            routes.push({ route: routeVal, stop: stopInput.value.trim() || '003345', name: nameInput.value.trim() });
+            localStorage.setItem('custom_bus_routes_v2', JSON.stringify(routes));
+            
+            routeInput.value = '';
+            nameInput.value = '';
+            fetchBusETA();
+        }
+
+        function removeBusRoute(index) {
+            let routes = getStoredBusRoutes();
+            routes.splice(index, 1);
+            localStorage.setItem('custom_bus_routes_v2', JSON.stringify(routes));
+            fetchBusETA();
         }
 
         async function loadMemosFromCloud() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { "X-Master-Key": MASTER_KEY }
-                });
-                if (!res.ok) throw new Error('Network error');
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
-                const memos = data.record;
-                if (Array.isArray(memos)) {
-                    renderMemos(memos);
-                    localStorage.setItem('cached_memos', JSON.stringify(memos));
+                if (Array.isArray(data.record)) {
+                    renderMemos(data.record);
+                    localStorage.setItem('cached_memos', JSON.stringify(data.record));
                 }
             } catch (e) {
                 const cached = localStorage.getItem('cached_memos');
@@ -403,10 +488,7 @@
             try {
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "X-Master-Key": MASTER_KEY 
-                    },
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(memos)
                 });
             } catch (e) {}
@@ -415,7 +497,7 @@
         function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
             if (memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1rem;">目前沒有備忘</div>';
+                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">目前沒有備忘</div>';
                 return;
             }
             listEl.innerHTML = memos.map((text, index) => `
@@ -435,7 +517,6 @@
             const input = document.getElementById('memo-input');
             const val = input.value.trim();
             if (!val) return;
-
             let memos = window.currentMemos || [];
             memos.push(val);
             input.value = '';
@@ -447,9 +528,7 @@
             let memos = window.currentMemos || [];
             const targetIndex = index + direction;
             if (targetIndex < 0 || targetIndex >= memos.length) return;
-            
-            + memos.splice(index, 1)[0];
-            const item = memos.splice(index, 1)[0]; // 確保安全調轉
+            const item = memos.splice(index, 1)[0];
             memos.splice(targetIndex, 0, item);
             renderMemos(memos);
             await saveMemosToCloud(memos);
@@ -464,15 +543,16 @@
 
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000); 
-        setInterval(fetchBusETA, 30000); 
-        setInterval(fetchMTR, 30000); 
         setInterval(loadMemosFromCloud, 30000); 
+        setInterval(fetchMTR, 30000);
+        setInterval(fetchBusETA, 30000);
 
         updateTime(); 
+        updateHolidayCountdown();
         fetchWeather();
-        fetchBusETA();
-        fetchMTR();
         loadMemosFromCloud(); 
+        fetchMTR();
+        fetchBusETA();
     </script>
 </body>
 </html>
