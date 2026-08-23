@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>3008 Tablet Dashboard</title>
-    <!-- 引入農曆與節氣計算庫 -->
-    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.14/lunar.js"></script>
+    <!-- 使用更穩定的 CDN 引入農曆計算庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
     <style>
         :root { 
             --bg-color: #0b0f19; 
@@ -116,11 +116,7 @@
         
         .refresh-memo-btn { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
 
-        .transit-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .transit-container { display: flex; flex-direction: column; gap: 6px; }
 
         .transit-card {
             background: rgba(0, 0, 0, 0.3);
@@ -132,26 +128,12 @@
             align-items: flex-start;
         }
 
-        .route-badge {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--accent-yellow);
-            background: rgba(251, 191, 36, 0.15);
-            padding: 1px 6px;
-            border-radius: 4px;
-            border: 1px solid rgba(251, 191, 36, 0.35);
-        }
+        .route-badge { font-size: 0.9rem; font-weight: 800; color: var(--accent-yellow); background: rgba(251, 191, 36, 0.15); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.35); }
         .transit-input-box { display: flex; gap: 6px; margin-bottom: 6px; }
         .transit-input { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); padding: 5px 8px; border-radius: 8px; color: var(--text-main); font-size: 0.9rem; outline: none; }
         .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 10px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; white-space: nowrap; }
 
-        .status-pill {
-            font-size: 0.7rem;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
+        .status-pill { font-size: 0.7rem; padding: 1px 5px; border-radius: 4px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.15); }
         .pill-active-special { background: rgba(251, 191, 36, 0.25); color: var(--accent-yellow); border-color: rgba(251, 191, 36, 0.5); }
         .pill-active-normal { background: rgba(52, 211, 153, 0.2); color: var(--accent-green); border-color: rgba(52, 211, 153, 0.4); }
         .pill-dim { background: rgba(255, 255, 255, 0.03); color: #6b7280; opacity: 0.35; }
@@ -175,7 +157,7 @@
             </div>
 
             <!-- 農曆與節氣資訊列 -->
-            <div id="lunar-info" style="font-size: 0.85rem; color: var(--accent-purple); font-weight: 600; text-align: center; background: rgba(192,132,252,0.1); padding: 3px 6px; border-radius: 6px; border: 1px solid rgba(192,132,252,0.2);">
+            <div id="lunar-info" style="font-size: 0.95rem; color: var(--accent-purple); font-weight: bold; text-align: center; background: rgba(192,132,252,0.1); padding: 4px 6px; border-radius: 6px; border: 1px solid rgba(192,132,252,0.2);">
                 載入農曆中...
             </div>
             
@@ -191,19 +173,21 @@
             </div>
         </div>
 
-        <!-- 右上：天氣資訊（含濕度） + 天氣警告提示 -->
+        <!-- 右上：天氣資訊（含濕度、降雨概率） + 天氣警告提示 -->
         <div class="panel">
             <div class="wx-box">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 38px; height: 38px; display: none;" onerror="this.style.display='none'">
+                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 42px; height: 42px; display: none;" onerror="this.style.display='none'">
                     <div>
                         <span class="wx-temp" id="current-temp">--°C</span>
-                        <div style="font-size: 0.85rem; color: var(--accent-blue); font-weight: bold; margin-top: 2px;">
-                            濕度: <span id="current-humidity">--%</span>
+                        <div style="font-size: 0.9rem; font-weight: bold; margin-top: 2px;">
+                            <span style="color: var(--accent-blue);">濕度: <span id="current-humidity">--%</span></span>
+                            <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">|</span>
+                            <span style="color: var(--accent-green);">降雨概率: <span id="wx-rain">--</span></span>
                         </div>
                     </div>
                 </div>
-                <div style="text-align: right; font-size: 0.9rem; font-weight: 600;">
+                <div style="text-align: right; font-size: 0.95rem; font-weight: bold;">
                     <div>最高: <span id="wx-max" style="color: var(--accent-orange);">--°C</span></div>
                     <div>最低: <span id="wx-min" style="color: var(--accent-blue);">--°C</span></div>
                 </div>
@@ -212,7 +196,7 @@
             <div style="font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: auto;">香港天文台數據</div>
         </div>
 
-        <!-- 左下：港鐵恆安站 + 雲端備忘錄 -->
+        <!-- 左下：港鐵恆安站（單行橫向大字版） + 雲端備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 0.9rem;">載入港鐵實時資料中...</div>
@@ -260,11 +244,7 @@
             { name: "農曆年初一", date: "2027-02-06" },
             { name: "農曆年初二", date: "2027-02-07" },
             { name: "農曆年初三", date: "2027-02-08" },
-            { name: "清明節", date: "2027-04-05" },
-            { name: "復活節星期五", date: "2027-03-26" },
-            { name: "勞動節", date: "2027-05-01" },
-            { name: "佛誕", date: "2027-05-13" },
-            { name: "端午節", date: "2027-06-09" }
+            { name: "清明節", date: "2027-04-05" }
         ];
 
         function toggleTheme() {
@@ -279,11 +259,7 @@
         }
 
         const savedTheme = localStorage.getItem('theme_mode');
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-        } else if (savedTheme === 'dark') {
-            document.body.classList.remove('light-mode');
-        }
+        if (savedTheme === 'light') document.body.classList.add('light-mode');
 
         function updateTime() {
             const now = new Date();
@@ -301,26 +277,26 @@
 
             // 計算農曆與節氣
             try {
-                const solar = Solar.fromDate(now);
-                const lunar = solar.getLunar();
-                const gzYear = lunar.getYearInGanZhi();
-                const shengXiao = lunar.getYearShengXiao();
-                const lunarMonth = lunar.getMonthInChinese();
-                const lunarDay = lunar.getDayInChinese();
-                
-                let jieQi = lunar.getJieQi();
-                if (!jieQi) {
-                    // 若當天非節氣，顯示最近或下一個節氣，或者當前所處節氣
-                    jieQi = lunar.getPrevJieQi() ? lunar.getPrevJieQi().getName() : '';
-                }
+                if (typeof Solar !== 'undefined') {
+                    const solar = Solar.fromDate(now);
+                    const lunar = solar.getLunar();
+                    const gzYear = lunar.getYearInGanZhi();
+                    const shengXiao = lunar.getYearShengXiao();
+                    const lunarMonth = lunar.getMonthInChinese();
+                    const lunarDay = lunar.getDayInChinese();
+                    
+                    // 獲取當前所屬節氣
+                    let jieQi = lunar.getJieQi();
+                    if (!jieQi) {
+                        const prevJieQi = lunar.getPrevJieQi(true); 
+                        if (prevJieQi) jieQi = prevJieQi.getName();
+                    }
 
-                let lunarText = `${gzYear}年 (${shengXiao}年) ${lunarMonth}月${lunarDay}`;
-                if (jieQi) {
-                    lunarText += ` | 節氣: ${jieQi}`;
+                    const lunarText = `${gzYear}, ${shengXiao}年${lunarMonth}月${lunarDay} | 節氣: ${jieQi || '--'}`;
+                    document.getElementById('lunar-info').textContent = lunarText;
                 }
-                document.getElementById('lunar-info').textContent = lunarText;
             } catch (e) {
-                document.getElementById('lunar-info').style.display = 'none';
+                console.error("Lunar parse error:", e);
             }
         }
 
@@ -331,11 +307,8 @@
             const upcoming = hkHolidays.map(h => {
                 const hDate = new Date(h.date);
                 hDate.setHours(0, 0, 0, 0);
-                const diffDays = Math.round((hDate - today) / (1000 * 60 * 60 * 24));
-                return { ...h, diffDays };
-            }).filter(h => h.diffDays >= 0);
-            
-            upcoming.sort((a, b) => a.diffDays - b.diffDays);
+                return { ...h, diffDays: Math.round((hDate - today) / (1000 * 60 * 60 * 24)) };
+            }).filter(h => h.diffDays >= 0).sort((a, b) => a.diffDays - b.diffDays);
             
             const el = document.getElementById('holiday-countdown');
             if (upcoming.length > 0) {
@@ -343,37 +316,29 @@
                 let timeText = next.diffDays === 0 ? '就是今天！' : `${next.diffDays} 日後`;
                 el.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.8rem; color: #9ca3af;">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
-                        <span style="font-size: 0.95rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
+                        <span style="font-size: 0.85rem; color: #9ca3af;">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
+                        <span style="font-size: 1rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
                     </div>
                 `;
-            } else {
-                el.innerHTML = `<div style="text-align: center; font-size: 0.8rem; color: #9ca3af;">暫無近期假期資料</div>`;
             }
         }
 
         async function fetchWeather() {
             try {
+                // 1. 獲取實時氣溫與濕度 (rhrread)
                 const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
                 const tempData = await tempRes.json();
                 
-                // 氣溫
                 if (tempData?.temperature?.data) {
                     const shatin = tempData.temperature.data.find(i => i.place === "沙田");
                     if (shatin) document.getElementById('current-temp').textContent = shatin.value + '°C';
                 }
 
-                // 濕度
                 if (tempData?.humidity?.data) {
-                    const shatinHumid = tempData.humidity.data.find(i => i.place === "沙田");
-                    if (shatinHumid) {
-                        document.getElementById('current-humidity').textContent = shatinHumid.value + '%';
-                    } else if (tempData.humidity.data.length > 0) {
-                        document.getElementById('current-humidity').textContent = tempData.humidity.data[0].value + '%';
-                    }
+                    const shatinHumid = tempData.humidity.data.find(i => i.place === "沙田") || tempData.humidity.data[0];
+                    if (shatinHumid) document.getElementById('current-humidity').textContent = shatinHumid.value + '%';
                 }
 
-                // 天氣圖示
                 if (tempData?.icon && tempData.icon.length > 0) {
                     const iconCode = tempData.icon[0];
                     const iconImg = document.getElementById('wx-icon-img');
@@ -381,6 +346,7 @@
                     iconImg.style.display = 'block';
                 }
 
+                // 2. 獲取最高/最低氣溫與降雨概率 (fnd)
                 const fRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
                 const fData = await fRes.json();
                 if (fData?.weatherForecast?.length > 0) {
@@ -389,11 +355,14 @@
                     if (todayFc) {
                         document.getElementById('wx-max').textContent = todayFc.forecastMaxtemp.value + '°C';
                         document.getElementById('wx-min').textContent = todayFc.forecastMintemp.value + '°C';
+                        
+                        // 顯著降雨概率 (PSR)
+                        if (todayFc.PSR) {
+                            document.getElementById('wx-rain').textContent = todayFc.PSR;
+                        }
                     }
                 }
-            } catch (e) {
-                document.getElementById('current-temp').textContent = '--°C';
-            }
+            } catch (e) {}
             fetchWeatherWarnings();
         }
 
@@ -405,24 +374,14 @@
                     const data = await res.json();
                     let warningHtml = '';
                     for (const key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            const warnItem = data[key];
-                            if (warnItem && warnItem.name) {
-                                warningHtml += `<span class="warning-badge">⚠️ ${warnItem.name}</span>`;
-                            }
+                        if (data[key] && data[key].name) {
+                            warningHtml += `<span class="warning-badge">⚠️ ${data[key].name}</span>`;
                         }
                     }
-                    if (warningHtml !== '') {
-                        warningBox.innerHTML = warningHtml;
-                        warningBox.style.display = 'flex';
-                    } else {
-                        warningBox.innerHTML = '';
-                        warningBox.style.display = 'none';
-                    }
+                    warningBox.innerHTML = warningHtml;
+                    warningBox.style.display = warningHtml ? 'flex' : 'none';
                 }
-            } catch (err) {
-                warningBox.style.display = 'none';
-            }
+            } catch (err) { warningBox.style.display = 'none'; }
         }
 
         async function fetchMTR() {
@@ -433,7 +392,7 @@
                 if (json.status === 1 && json.data) {
                     const stationData = json.data['TML-HEO'];
                     if (!stationData) {
-                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 4px; font-size: 0.85rem;">暫無列車資料</div>';
+                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 4px;">暫無列車資料</div>';
                         return;
                     }
 
@@ -441,39 +400,38 @@
                     const upTrains = (stationData.UP || []).slice(0, 2);
                     const destMap = { 'WKS': '烏溪沙', 'MOS': '馬鞍山', 'TUM': '屯門', 'HUH': '紅磡', 'ETS': '尖東', 'KAT': '啟德', 'DIH': '鑽石山' };
 
-                    let gridHtml = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">';
-                    for (let i = 0; i < 2; i++) {
-                        gridHtml += renderMtrCell(downTrains[i], '屯門', destMap);
-                        gridHtml += renderMtrCell(upTrains[i], '烏溪沙', destMap);
-                    }
-                    gridHtml += '</div>';
+                    let html = '<div style="display: flex; flex-direction: column; gap: 4px;">';
+                    // 往下行 (屯門方向)
+                    downTrains.forEach(t => { html += renderMtrRow(t, '屯門', destMap); });
+                    // 往上行 (烏溪沙方向)
+                    upTrains.forEach(t => { html += renderMtrRow(t, '烏溪沙', destMap); });
+                    html += '</div>';
                     
-                    container.innerHTML = gridHtml;
+                    container.innerHTML = html;
                 }
             } catch (e) {}
         }
 
-        function renderMtrCell(t, defaultDestName, destMap) {
-            if (!t) {
-                return `<div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 5px; font-size: 0.8rem; color: #6b7280; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 38px;">暫無班次</div>`;
-            }
+        // 修改為：同一行、大字體顯示
+        function renderMtrRow(t, defaultDestName, destMap) {
+            if (!t) return '';
             const destName = destMap[t.dest] || t.dest || defaultDestName;
             const trainTime = new Date(t.time.replace(/-/g, '/'));
             const diffMin = Math.round((trainTime - new Date()) / 60000);
-            const trainHours = String(trainTime.getHours()).padStart(2, '0');
-            const trainMinutes = String(trainTime.getMinutes()).padStart(2, '0');
-            const clockTime = `${trainHours}:${trainMinutes}`;
-            const timeText = diffMin <= 0 ? '即到' : `${diffMin}分`;
-            const destColor = (t.dest === 'WKS') ? 'var(--accent-blue)' : 'var(--accent-purple)';
+            
+            const hours = String(trainTime.getHours()).padStart(2, '0');
+            const mins = String(trainTime.getMinutes()).padStart(2, '0');
+            const clockTime = `${hours}:${mins}`;
+            
+            const timeText = diffMin <= 0 ? '即到' : `${diffMin} 分`;
+            const destColor = (t.dest === 'WKS' || destName === '烏溪沙') ? 'var(--accent-blue)' : 'var(--accent-purple)';
 
             return `
-                <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(192,132,252,0.25); border-radius: 8px; padding: 5px 7px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="font-size: 0.75rem; color: ${destColor}; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
-                        開往 ${destName}
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 2px; font-size: 0.9rem;">
-                        <span style="color: var(--accent-green); font-weight: bold;">${timeText}</span>
-                        <span style="color: var(--accent-yellow); font-weight: bold;">${clockTime}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px 12px;">
+                    <span style="font-size: 1.15rem; color: ${destColor}; font-weight: bold;">往 ${destName}</span>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span style="font-size: 1.25rem; color: var(--accent-green); font-weight: 800;">${timeText}</span>
+                        <span style="font-size: 1.1rem; color: var(--accent-yellow); font-weight: bold;">${clockTime}</span>
                     </div>
                 </div>
             `;
@@ -481,9 +439,7 @@
 
         function getStoredBusRoutes() {
             const saved = localStorage.getItem('custom_bus_routes');
-            if (saved) {
-                try { return JSON.parse(saved); } catch (e) {}
-            }
+            if (saved) { try { return JSON.parse(saved); } catch (e) {} }
             return [
                 { route: '85K', stop: '003345', name: '錦鞍苑往沙田' },
                 { route: '681', stop: '003345', name: '錦鞍苑往港島' }
@@ -493,11 +449,7 @@
         async function fetchBusETA() {
             const container = document.getElementById('bus-eta-list');
             const routes = getStoredBusRoutes();
-
-            if (routes.length === 0) {
-                container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 8px; font-size: 0.9rem;">請於上方新增路線</div>';
-                return;
-            }
+            if (routes.length === 0) return;
 
             let htmlContent = '';
             for (let i = 0; i < routes.length; i++) {
@@ -505,19 +457,11 @@
                 try {
                     let etas = [];
                     for (let st = 1; st <= 2; st++) {
-                        try {
-                            const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stop}/${r.route}/${st}`);
-                            if (res.ok) {
-                                const data = await res.json();
-                                if (data && data.data) {
-                                    if (Array.isArray(data.data)) {
-                                        etas = etas.concat(data.data);
-                                    } else {
-                                        etas.push(data.data);
-                                    }
-                                }
-                            }
-                        } catch (err) {}
+                        const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stop}/${r.route}/${st}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.data) etas = etas.concat(data.data);
+                        }
                     }
                     
                     let etasListHtml = '';
@@ -525,51 +469,35 @@
                         const validEtas = etas.filter(e => e.eta);
                         if (validEtas.length > 0) {
                             validEtas.sort((a, b) => new Date(a.eta) - new Date(b.eta));
-                            
                             const uniqueEtas = [];
                             validEtas.forEach(e => {
                                 const eTime = new Date(e.eta).getTime();
-                                const isDuplicate = uniqueEtas.some(existing => {
-                                    const exTime = new Date(existing.eta).getTime();
-                                    return Math.abs(eTime - exTime) < 60000;
-                                });
-                                if (!isDuplicate) uniqueEtas.push(e);
+                                if (!uniqueEtas.some(existing => Math.abs(eTime - new Date(existing.eta).getTime()) < 60000)) {
+                                    uniqueEtas.push(e);
+                                }
                             });
 
-                            const topEtas = uniqueEtas.slice(0, 3);
-                            
-                            etasListHtml = topEtas.map((e, idx) => {
+                            etasListHtml = uniqueEtas.slice(0, 3).map((e, idx) => {
                                 const nextTime = new Date(e.eta);
                                 const diffMin = Math.round((nextTime - new Date()) / 60000);
                                 const timeStr = diffMin <= 1 ? '將到' : `${diffMin}分鐘`;
-                                
-                                const hours = String(nextTime.getHours()).padStart(2, '0');
-                                const mins = String(nextTime.getMinutes()).padStart(2, '0');
-                                const clockTime = `${hours}:${mins}`;
+                                const clockTime = `${String(nextTime.getHours()).padStart(2, '0')}:${String(nextTime.getMinutes()).padStart(2, '0')}`;
 
-                                const rmkText = e.rmk_tc && e.rmk_tc.trim() !== '' ? e.rmk_tc.trim() : '';
-                                const isSpecial = (e.service_type && e.service_type > 1) || 
-                                                  (rmkText !== '' && rmkText !== '原定班次' && (rmkText.includes('特別') || rmkText.includes('特班') || rmkText.includes('特別班次')));
+                                const rmkText = e.rmk_tc ? e.rmk_tc.trim() : '';
+                                const isSpecial = (e.service_type > 1) || (rmkText !== '' && rmkText !== '原定班次' && rmkText.includes('特別'));
                                 
-                                const specialClass = isSpecial ? 'pill-active-special' : 'pill-dim';
-                                const normalClass = !isSpecial ? 'pill-active-normal' : 'pill-dim';
-
                                 return `
                                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-top: 2px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 2px;">
                                         <span style="color: #9ca3af;">${idx + 1}: <strong style="color: var(--accent-green);">${timeStr}</strong> <span style="font-size: 0.75rem;">(${clockTime})</span></span>
                                         <div style="display: flex; gap: 3px; align-items: center;">
-                                            <span class="status-pill ${specialClass}">特別</span>
-                                            <span class="status-pill ${normalClass}">普通</span>
+                                            <span class="status-pill ${isSpecial ? 'pill-active-special' : 'pill-dim'}">特別</span>
+                                            <span class="status-pill ${!isSpecial ? 'pill-active-normal' : 'pill-dim'}">普通</span>
                                         </div>
                                     </div>
                                 `;
                             }).join('');
-                        } else {
-                            etasListHtml = '<div style="color: #9ca3af; font-size: 0.85rem; margin-top: 2px;">暫無班次</div>';
-                        }
-                    } else {
-                        etasListHtml = '<div style="color: #9ca3af; font-size: 0.85rem; margin-top: 2px;">暫無班次</div>';
-                    }
+                        } else { etasListHtml = '<div style="color: #9ca3af; font-size: 0.85rem;">暫無班次</div>'; }
+                    } else { etasListHtml = '<div style="color: #9ca3af; font-size: 0.85rem;">暫無班次</div>'; }
 
                     htmlContent += `
                         <div class="transit-card">
@@ -579,7 +507,7 @@
                                         <span class="route-badge">${r.route}</span>
                                         ${r.name ? `<span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
                                     </div>
-                                    <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-weight:bold; font-size:0.95rem; padding: 0;">✕</button>
+                                    <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-weight:bold;">✕</button>
                                 </div>
                                 <div>${etasListHtml}</div>
                             </div>
@@ -596,16 +524,13 @@
             const nameInput = document.getElementById('bus-name-input');
             
             const routeVal = routeInput.value.trim().toUpperCase();
-            const stopVal = stopInput.value.trim() || '003345';
-            const nameVal = nameInput.value.trim();
-
             if (!routeVal) return;
+            
             let routes = getStoredBusRoutes();
-            routes.push({ route: routeVal, stop: stopVal, name: nameVal });
+            routes.push({ route: routeVal, stop: stopInput.value.trim() || '003345', name: nameInput.value.trim() });
             localStorage.setItem('custom_bus_routes', JSON.stringify(routes));
             
-            routeInput.value = '';
-            nameInput.value = '';
+            routeInput.value = ''; nameInput.value = '';
             fetchBusETA();
         }
 
@@ -662,10 +587,9 @@
 
         async function addMemo() {
             const input = document.getElementById('memo-input');
-            const val = input.value.trim();
-            if (!val) return;
+            if (!input.value.trim()) return;
             let memos = window.currentMemos || [];
-            memos.push(val);
+            memos.push(input.value.trim());
             input.value = '';
             renderMemos(memos);
             await saveMemosToCloud(memos);
@@ -687,6 +611,11 @@
             renderMemos(memos);
             await saveMemosToCloud(memos);
         }
+
+        // 當農曆函式庫載入完成後，確保能立刻觸發一次更新
+        window.onload = function() {
+            updateTime();
+        };
 
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000); 
