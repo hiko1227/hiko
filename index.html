@@ -13,6 +13,7 @@
             --accent-green: #10b981;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
+            --accent-warn: #f59e0b;
         }
 
         * {
@@ -59,22 +60,23 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 12px 16px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        /* 左側：大時間與日期 */
+        /* 左側：時間與日期 */
         .time-card {
-            flex: 2;
+            flex: 1.5;
             text-align: center;
             background: linear-gradient(135deg, rgba(28, 37, 65, 0.9), rgba(11, 19, 43, 0.9));
         }
 
+        /* 將時間字體縮小 */
         #clock {
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: 800;
             letter-spacing: 1px;
             line-height: 1.1;
@@ -83,24 +85,36 @@
         }
 
         #date {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         #countdown {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #f59e0b;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: var(--accent-warn);
             background: rgba(245, 158, 11, 0.1);
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 6px;
             display: inline-block;
         }
 
         /* 天氣卡片 */
         .weather-card {
-            flex: 1;
+            flex: 1.2;
+        }
+
+        .weather-alert {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            font-weight: bold;
         }
 
         /* 恆指卡片 */
@@ -113,18 +127,18 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(255, 255, 255, 0.04);
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 10px;
             margin-top: 6px;
         }
 
         #hsi-price {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }
 
         #hsi-change {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
         }
 
@@ -137,7 +151,7 @@
 
         /* 備忘錄卡片 */
         .memo-card {
-            flex: 2;
+            flex: 1.7;
             justify-content: flex-start;
             overflow: hidden;
         }
@@ -174,7 +188,7 @@
 
         #memo-list {
             overflow-y: auto;
-            max-height: 120px;
+            max-height: 100px;
             padding-right: 4px;
         }
 
@@ -186,7 +200,7 @@
             background: rgba(255, 255, 255, 0.04);
             border-radius: 6px;
             margin-bottom: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .memo-delete {
@@ -198,9 +212,8 @@
             padding: 0 4px;
         }
 
-        /* 標題共用樣式 */
         .card-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             color: var(--text-secondary);
             display: flex;
@@ -222,7 +235,8 @@
 
             <div class="card weather-card">
                 <div class="card-title">香港即時天氣</div>
-                <div id="weather-info" style="font-size: 1rem; margin-top: 6px;">載入天氣數據中...</div>
+                <div id="weather-info" style="font-size: 0.95rem; margin-top: 4px;">載入天氣數據中...</div>
+                <div id="weather-alerts"></div>
             </div>
         </div>
 
@@ -276,10 +290,13 @@
             document.getElementById('countdown').textContent = `距離 10月1日 假期：仲有 ${diffDays} 天`;
         }
 
-        // 3. 香港天文台天氣
+        // 3. 香港天文台天氣與警示 API
         async function fetchWeather() {
             const weatherEl = document.getElementById('weather-info');
+            const alertsEl = document.getElementById('weather-alerts');
+
             try {
+                // 即時天氣
                 const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
                 const data = await res.json();
                 
@@ -287,29 +304,48 @@
                 const humidity = data.humidity.data[0].value;
                 const rainfall = data.rainfall.data[0]?.max || 0;
 
-                weatherEl.innerHTML = `🌡️ 氣溫: <b>${temp}°C</b> &nbsp;|&nbsp; 💧 濕度: <b>${humidity}%</b><br><span style="font-size:0.85rem; color:#94a3b8;">🌧️ 今日降雨量: ${rainfall} mm</span>`;
+                weatherEl.innerHTML = `🌡️ 氣溫: <b>${temp}°C</b> &nbsp;|&nbsp; 💧 濕度: <b>${humidity}%</b><br><span style="font-size:0.8rem; color:#94a3b8;">🌧️ 今日降雨量: ${rainfall} mm</span>`;
+
+                // 天氣警告摘要
+                const warnRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+                const warnData = await warnRes.json();
+                
+                let alertHtml = '';
+                if (warnData && Object.keys(warnData).length > 0) {
+                    for (const key in warnData) {
+                        const warn = warnData[key];
+                        if (warn.name) {
+                            alertHtml += `<span class="weather-alert">⚠️ ${warn.name}</span> `;
+                        }
+                    }
+                }
+                alertsEl.innerHTML = alertHtml || '<span style="font-size:0.75rem; color:#10b981; margin-top:4px; display:block;">現時無特別天氣警告</span>';
+
             } catch (err) {
                 weatherEl.textContent = '天氣數據讀取失敗';
             }
         }
 
-        // 4. 香港恆生指數 (Yahoo Finance API)
+        // 4. 香港恆生指數 (改用新浪/東方財富開放 API，避免 CORS 跨網域阻擋)
         async function fetchHSI() {
             const priceEl = document.getElementById('hsi-price');
             const changeEl = document.getElementById('hsi-change');
             const timeEl = document.getElementById('hsi-update-time');
 
             try {
-                const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EHSI?interval=1m&range=1d');
+                // 使用跨網域友善的東方財富/港股 API 來源
+                const res = await fetch('https://push2.eastmoney.com/api/qt/stock/get?secid=100.HSI&fields=f43,f169,f170');
                 if (!res.ok) throw new Error('網絡數據讀取失敗');
                 
-                const data = await res.json();
-                const meta = data.chart.result[0].meta;
+                const responseData = await res.json();
+                const data = responseData.data;
+
+                if (!data) throw new Error('無數據');
                 
-                const currentPrice = meta.regularMarketPrice;
-                const previousClose = meta.chartPreviousClose;
-                const change = currentPrice - previousClose;
-                const changePercent = (change / previousClose) * 100;
+                // f43: 當前價 (除以 100), f169: 漲跌額, f170: 漲跌幅(%)
+                const currentPrice = data.f43 / 100;
+                const change = data.f169 / 100;
+                const changePercent = data.f170 / 100;
                 
                 const isPositive = change >= 0;
                 const sign = isPositive ? '+' : '';
@@ -324,8 +360,39 @@
                 const now = new Date();
                 timeEl.textContent = `更新時間: ${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
             } catch (err) {
-                console.error('抓取恆指失敗:', err);
-                priceEl.textContent = '無法取得數據';
+                console.error('抓取恆指失敗，嘗試備用來源:', err);
+                fetchHSIBackup();
+            }
+        }
+
+        // 恆指備用 API
+        async function fetchHSIBackup() {
+            const priceEl = document.getElementById('hsi-price');
+            const changeEl = document.getElementById('hsi-change');
+            const timeEl = document.getElementById('hsi-update-time');
+
+            try {
+                const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/%5EHSI?interval=1m&range=1d'));
+                const data = await res.json();
+                const meta = data.chart.result[0].meta;
+                
+                const currentPrice = meta.regularMarketPrice;
+                const previousClose = meta.chartPreviousClose;
+                const change = currentPrice - previousClose;
+                const changePercent = (change / previousClose) * 100;
+                
+                const isPositive = change >= 0;
+                const sign = isPositive ? '+' : '';
+                const color = isPositive ? 'var(--accent-green)' : 'var(--accent-red)';
+
+                priceEl.textContent = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                changeEl.textContent = `${sign}${change.toFixed(2)} (${sign}${changePercent.toFixed(2)}%)`;
+                changeEl.style.color = color;
+
+                const now = new Date();
+                timeEl.textContent = `更新時間: ${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
+            } catch (err) {
+                priceEl.textContent = '數據暫時無法取得';
                 changeEl.textContent = '--';
             }
         }
