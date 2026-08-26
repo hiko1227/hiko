@@ -2,703 +2,353 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <title>3008 Tablet Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人資訊儀表板</title>
     <style>
-        :root { 
-            --bg-color: #0b0f19; 
-            --card-bg: rgba(255, 255, 255, 0.045); 
-            --text-main: #f3f4f6; 
-            --accent-blue: #60a5fa;
-            --accent-green: #34d399;
-            --accent-yellow: #fbbf24;
-            --accent-purple: #c084fc;
-            --accent-orange: #f59e0b;
-            --accent-red: #f87171;
-            --accent-pink: #f472b6;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
         }
 
-        body.light-mode {
-            --bg-color: #f0f2f5;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #1f2937;
-            --accent-blue: #2563eb;
-            --accent-green: #059669;
-            --accent-yellow: #d97706;
-            --accent-purple: #7c3aed;
-            --accent-orange: #d97706;
-            --accent-red: #dc2626;
-            --accent-pink: #db2777;
-        }
-        
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            padding: 10px; 
-            margin: 0; 
-            font-size: 1.1rem; 
-            transition: background-color 0.5s ease, color 0.5s ease;
-            -webkit-font-smoothing: antialiased;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
-        .main-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            max-width: 1280px; 
-            margin: auto; 
-        } 
-        
-        .panel { 
-            background: var(--card-bg); 
-            padding: 14px 18px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(52, 211, 153, 0.2); 
-            backdrop-filter: blur(16px); 
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
 
-        .panel-top-left {
-            justify-content: center; 
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .theme-toggle-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-main);
-            padding: 6px 10px;
-            border-radius: 8px;
-            cursor: pointer;
+        /* 時間與倒數卡片 */
+        .time-box {
+            text-align: center;
+        }
+        #clock {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        #date {
             font-size: 1.1rem;
-            transition: background 0.2s;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
-        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.15); }
-
-        .clock { font-size: 3.4rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
-        .ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
-
-        .wx-box { display: flex; align-items: center; justify-content: space-between; }
-        .wx-temp { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
-
-        @keyframes warningBlink {
-            0% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
-            50% { opacity: 0.5; transform: scale(0.98); box-shadow: 0 0 2px rgba(248, 113, 113, 0.1); }
-            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+        #countdown {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #f59e0b;
         }
-        .warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-        .warning-badge {
-            background: rgba(248, 113, 113, 0.2);
-            color: var(--accent-red);
-            border: 1px solid rgba(248, 113, 113, 0.5);
-            padding: 6px 12px;
-            border-radius: 8px;
+
+        /* 恆指卡片 */
+        .hsi-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .hsi-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+        }
+        #hsi-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        #hsi-change {
             font-size: 1.1rem;
             font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            animation: warningBlink 1.5s infinite ease-in-out;
+        }
+        .update-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 8px;
         }
 
-        /* 備忘錄 */
-        .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); padding: 12px 16px; border-radius: 10px; color: var(--text-main); font-size: 1.4rem; outline: none; }
-        .memo-input:focus { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(52,211,153,0.2); }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 22px; border-radius: 10px; font-weight: bold; font-size: 1.3rem; cursor: pointer; }
-        
-        .memo-list { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.4rem; font-weight: 600; gap: 10px; border: 1px solid rgba(255,255,255,0.06); }
-
-        .memo-actions { display: flex; gap: 8px; }
-        .memo-action-btn { background: rgba(255,255,255,0.1); color: var(--text-main); border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 1.1rem; }
-        .memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.4rem; padding: 0 6px; }
-        
-        .refresh-memo-btn { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
-        .refresh-memo-btn:active { background: rgba(255, 255, 255, 0.25); }
-
-        .transit-container { display: flex; flex-direction: column; gap: 10px; }
-
-        /* 港鐵 4x1 橫排 */
-        .mtr-grid-4x1 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        .mtr-card-4x1 {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            border-radius: 10px;
-            padding: 10px 4px;
+        /* 雲端備忘錄 */
+        .memo-input-group {
             display: flex;
-            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .memo-input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        .memo-input-group button {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-blue);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .memo-item {
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            text-align: center;
-            min-height: 100px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
         }
-
-        /* 九巴 3 格橫排樣式 */
-        .bus-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-        .bus-card-box {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            border-radius: 10px;
-            padding: 10px 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            min-height: 100px;
-        }
-
-        .route-badge { font-size: 1.35rem; font-weight: 900; color: var(--accent-yellow); background: rgba(251, 191, 36, 0.2); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.4); }
-        .transit-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .transit-input { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); padding: 10px; border-radius: 8px; color: var(--text-main); font-size: 1.15rem; outline: none; }
-        .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.15rem; cursor: pointer; white-space: nowrap; }
-
-        .status-pill { font-size: 0.95rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2); }
-        
-        /* 特別車：粉紅色 */
-        .pill-active-special { 
-            background: rgba(244, 114, 182, 0.25); 
-            color: var(--accent-pink); 
-            border-color: rgba(244, 114, 182, 0.6); 
-        }
-        
-        /* 普通車：綠色 */
-        .pill-active-normal { 
-            background: rgba(52, 211, 153, 0.25); 
-            color: var(--accent-green); 
-            border-color: rgba(52, 211, 153, 0.5); 
-        }
-
-        @media (max-width: 850px) {
-            .main-grid { grid-template-columns: 1fr; }
+        .memo-delete {
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-size: 1.1rem;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-grid">
-        <!-- 左上：日期、農曆與大時鐘 -->
-        <div class="panel panel-top-left">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <div style="display: flex; align-items: baseline; gap: 12px;">
-                    <span class="date-part" id="date-part" style="font-size: 1.4rem; font-weight: 800;">--</span>
-                    <span class="weekday-part" id="weekday-part" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-blue);">--</span>
-                </div>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="切換 Light / Dark 模式">🌓</button>
-            </div>
-
-            <div id="lunar-info" style="font-size: 1.15rem; color: var(--accent-purple); font-weight: bold; text-align: center; background: rgba(192,132,252,0.1); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(192,132,252,0.2);">
-                載入農曆中...
-            </div>
-            
-            <div style="text-align: center; margin-top: 10px;">
-                <div style="display: flex; align-items: baseline; justify-content: center; gap: 10px;">
-                    <span class="clock" id="clock">00:00:00</span>
-                    <span class="ampm" id="ampm">--</span>
-                </div>
-            </div>
+    <div class="container">
+        <!-- 時間與假期倒數 -->
+        <div class="card time-box">
+            <div id="clock">00:00:00</div>
+            <div id="date">加載中...</div>
+            <div id="countdown">假期倒數：計算中...</div>
         </div>
 
-        <!-- 右上：天氣資訊與假期倒數 -->
-        <div class="panel">
-            <div class="wx-box">
-                <div style="display: flex; align-items: center; gap: 18px;">
-                    <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 64px; height: 64px; display: none;" onerror="this.style.display='none'">
-                    <div>
-                        <div style="display: flex; align-items: baseline; gap: 8px;">
-                            <span class="wx-temp" id="current-temp">--°C</span>
-                        </div>
-                        <div style="font-size: 1.4rem; font-weight: bold; margin-top: 6px; display: flex; gap: 12px; align-items: center;">
-                            <span style="color: var(--accent-blue);">濕度: <span id="current-humidity">--%</span></span>
-                            <span style="color: rgba(255,255,255,0.3);">|</span>
-                            <span style="color: var(--accent-green);">降雨: <span id="wx-rain">--</span></span>
-                        </div>
-                    </div>
-                </div>
-                <div style="text-align: right; font-size: 1.25rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="color: var(--accent-orange);">最高: <span id="wx-max">--°C</span></div>
-                    <div style="color: var(--accent-blue); margin-top: 4px;">最低: <span id="wx-min">--°C</span></div>
-                </div>
-            </div>
-            
-            <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
-            
-            <div id="holiday-countdown" style="margin-top: auto; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
-                <span style="font-size: 1.05rem; color: #9ca3af;">計算假期中...</span>
-            </div>
+        <!-- 天氣資訊 -->
+        <div class="card">
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;">香港即時天氣</div>
+            <div id="weather-info" style="font-size: 1.1rem;">載入天氣數據中...</div>
         </div>
 
-        <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 (npoint.io) -->
-        <div class="panel">
-            <div class="transit-container" id="mtr-eta-list">
-                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
+        <!-- 香港恆生指數卡片 -->
+        <div class="card">
+            <div class="hsi-header">香港恆生指數 (HSI)</div>
+            <div class="hsi-body">
+                <div id="hsi-price">載入中...</div>
+                <div id="hsi-change">--</div>
             </div>
-
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 6px;">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 手動同步雲端</button>
-                </div>
-                <div class="memo-input-box">
-                    <input type="text" id="memo-input" class="memo-input" placeholder="新增備忘事項..." onkeypress="if(event.key==='Enter')addMemo()">
-                    <button class="memo-btn" onclick="addMemo()">新增</button>
-                </div>
-                <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">正在讀取備忘...</div>
-                </div>
-            </div>
+            <div id="hsi-update-time" class="update-time">更新時間: --</div>
         </div>
 
-        <!-- 右下：九巴實時到站 (2行 x 每行3格班次) -->
-        <div class="panel">
-            <div class="transit-input-box">
-                <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
-                <input type="text" id="bus-stop-input" class="transit-input" style="width: 90px; text-align: center;" placeholder="站ID" value="003345">
-                <input type="text" id="bus-name-input" class="transit-input" style="flex: 1;" placeholder="自訂名稱">
-                <button class="transit-add-btn" onclick="addBusRoute()">新增</button>
+        <!-- 雲端備忘錄 -->
+        <div class="card">
+            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 12px;">備忘錄</div>
+            <div class="memo-input-group">
+                <input type="text" id="memo-input" placeholder="新增事項..." onkeypress="if(event.key==='Enter') addMemo()">
+                <button onclick="addMemo()">新增</button>
             </div>
-            <div class="transit-container" id="bus-eta-list" style="max-height: 360px; overflow-y: auto;">
-                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入巴士資料中...</div>
-            </div>
+            <div id="memo-list"></div>
         </div>
     </div>
 
     <script>
-        // npoint.io 設定
-        const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
+        // 設定你的 npoint.io URL (如果有的話)
+        const NPOINT_URL = 'https://api.npoint.io/YOUR_NPOINT_ID';
 
-        const hkHolidays = [
-            { name: "中秋節翌日", date: "2026-09-28" },
-            { name: "國慶日", date: "2026-10-01" },
-            { name: "重陽節", date: "2026-10-23" },
-            { name: "聖誕節", date: "2026-12-25" },
-            { name: "聖誕節後第一個周日", date: "2026-12-26" },
-            { name: "元旦", date: "2027-01-01" },
-            { name: "農曆年初一", date: "2027-02-06" },
-            { name: "農曆年初二", date: "2027-02-07" },
-            { name: "農曆年初三", date: "2027-02-08" },
-            { name: "清明節", date: "2027-04-05" }
-        ];
-
-        function toggleTheme() {
-            const body = document.body;
-            if (body.classList.contains('light-mode')) {
-                body.classList.remove('light-mode');
-                localStorage.setItem('theme_mode', 'dark');
-            } else {
-                body.classList.add('light-mode');
-                localStorage.setItem('theme_mode', 'light');
-            }
-        }
-
-        const savedTheme = localStorage.getItem('theme_mode');
-        if (savedTheme === 'light') document.body.classList.add('light-mode');
-
+        // 1. 時鐘與日期
         function updateTime() {
             const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12; hours = hours ? hours : 12;
-            const hoursStr = String(hours).padStart(2, '0');
-
-            document.getElementById('clock').textContent = `${hoursStr}:${minutes}:${seconds}`;
-            document.getElementById('ampm').textContent = ampm;
-            document.getElementById('date-part').textContent = now.toLocaleDateString('zh-HK', {month:'long', day:'numeric'});
-            document.getElementById('weekday-part').textContent = now.toLocaleDateString('zh-HK', {weekday:'long'});
-
-            try {
-                if (typeof Solar !== 'undefined') {
-                    const solar = Solar.fromDate(now);
-                    const lunar = solar.getLunar();
-                    const gzYear = lunar.getYearInGanZhi();
-                    const shengXiao = lunar.getYearShengXiao();
-                    const lunarMonth = lunar.getMonthInChinese();
-                    const lunarDay = lunar.getDayInChinese();
-                    
-                    let jieQi = lunar.getJieQi();
-                    if (!jieQi) {
-                        const prevJieQi = lunar.getPrevJieQi(true); 
-                        if (prevJieQi) jieQi = prevJieQi.getName();
-                    }
-
-                    const lunarText = `${gzYear}, ${shengXiao}年${lunarMonth}月${lunarDay} | 節氣: ${jieQi || '--'}`;
-                    document.getElementById('lunar-info').textContent = lunarText;
-                }
-            } catch (e) {}
+            document.getElementById('clock').textContent = now.toLocaleTimeString('zh-HK', { hour12: false });
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-HK', options);
         }
 
+        // 2. 假期倒數範例 (可自行更換日期與名稱)
         function updateHolidayCountdown() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const now = new Date();
+            const currentYear = now.getFullYear();
             
-            const upcoming = hkHolidays.map(h => {
-                const hDate = new Date(h.date);
-                hDate.setHours(0, 0, 0, 0);
-                return { ...h, diffDays: Math.round((hDate - today) / (1000 * 60 * 60 * 24)) };
-            }).filter(h => h.diffDays >= 0).sort((a, b) => a.diffDays - b.diffDays);
-            
-            const el = document.getElementById('holiday-countdown');
-            if (upcoming.length > 0) {
-                const next = upcoming[0];
-                let timeText = next.diffDays === 0 ? '就是今天！' : `${next.diffDays} 日後`;
-                el.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 1.1rem; color: #9ca3af;">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
-                        <span style="font-size: 1.25rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
-                    </div>
-                `;
+            // 預設倒數：國慶日 (10月1日)
+            let nextHoliday = new Date(currentYear, 9, 1); 
+            if (now > nextHoliday) {
+                nextHoliday = new Date(currentYear + 1, 9, 1);
             }
+
+            const diffTime = nextHoliday - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('countdown').textContent = `距離下一個主要假期 (10月1日)：仲有 ${diffDays} 天`;
         }
 
+        // 3. 抓取天文台天氣 API
         async function fetchWeather() {
+            const weatherEl = document.getElementById('weather-info');
             try {
-                const tempRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
-                const tempData = await tempRes.json();
-                
-                if (tempData?.temperature?.data) {
-                    const shatin = tempData.temperature.data.find(i => i.place === "沙田");
-                    if (shatin) document.getElementById('current-temp').textContent = shatin.value + '°C';
-                }
-
-                if (tempData?.humidity?.data) {
-                    const shatinHumid = tempData.humidity.data.find(i => i.place === "沙田") || tempData.humidity.data[0];
-                    if (shatinHumid) document.getElementById('current-humidity').textContent = shatinHumid.value + '%';
-                }
-
-                if (tempData?.icon && tempData.icon.length > 0) {
-                    const iconCode = tempData.icon[0];
-                    const iconImg = document.getElementById('wx-icon-img');
-                    iconImg.src = `https://www.hko.gov.hk/images/wxicon/pic${iconCode}.png`;
-                    iconImg.style.display = 'block';
-                }
-
-                const fRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
-                const fData = await fRes.json();
-                if (fData?.weatherForecast?.length > 0) {
-                    const nowStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
-                    let todayFc = fData.weatherForecast.find(f => f.forecastDate === nowStr) || fData.weatherForecast[0];
-                    if (todayFc) {
-                        document.getElementById('wx-max').textContent = todayFc.forecastMaxtemp.value + '°C';
-                        document.getElementById('wx-min').textContent = todayFc.forecastMintemp.value + '°C';
-                        if (todayFc.PSR) {
-                            document.getElementById('wx-rain').textContent = todayFc.PSR;
-                        }
-                    }
-                }
-            } catch (e) {}
-            fetchWeatherWarnings();
-        }
-
-        async function fetchWeatherWarnings() {
-            const warningBox = document.getElementById('weather-warning-box');
-            try {
-                const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
-                if (res.ok) {
-                    const data = await res.json();
-                    let warningHtml = '';
-                    for (const key in data) {
-                        if (data[key] && data[key].name) {
-                            warningHtml += `<span class="warning-badge">⚠️ ${data[key].name}</span>`;
-                        }
-                    }
-                    warningBox.innerHTML = warningHtml;
-                    warningBox.style.display = warningHtml ? 'flex' : 'none';
-                }
-            } catch (err) { warningBox.style.display = 'none'; }
-        }
-
-        async function fetchMTR() {
-            const container = document.getElementById('mtr-eta-list');
-            try {
-                const res = await fetch('https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=TML&sta=HEO');
-                const json = await res.json();
-                if (json.status === 1 && json.data) {
-                    const stationData = json.data['TML-HEO'];
-                    if (!stationData) {
-                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px;">暫無列車資料</div>';
-                        return;
-                    }
-
-                    const destMap = { 'WKS': '烏溪沙', 'MOS': '馬鞍山', 'TUM': '屯門', 'HUH': '紅磡', 'ETS': '尖東', 'KAT': '啟德', 'DIH': '鑽石山' };
-                    
-                    let allTrains = [];
-                    (stationData.DOWN || []).forEach(t => allTrains.push({ ...t, defaultDest: '屯門' }));
-                    (stationData.UP || []).forEach(t => allTrains.push({ ...t, defaultDest: '烏溪沙' }));
-                    
-                    allTrains.sort((a, b) => new Date(a.time.replace(/-/g, '/')) - new Date(b.time.replace(/-/g, '/')));
-                    const top4Trains = allTrains.slice(0, 4);
-
-                    let html = '<div class="mtr-grid-4x1">';
-                    for (let i = 0; i < 4; i++) {
-                        html += renderMtrCard4x1(top4Trains[i], destMap);
-                    }
-                    html += '</div>';
-                    
-                    container.innerHTML = html;
-                }
-            } catch (e) {}
-        }
-
-        function renderMtrCard4x1(t, destMap) {
-            if (!t) {
-                return `
-                    <div class="mtr-card-4x1" style="opacity: 0.3; justify-content: center;">
-                        <span style="font-size: 0.95rem; color: #9ca3af;">暫無班次</span>
-                    </div>
-                `;
-            }
-            const destName = destMap[t.dest] || t.dest || t.defaultDest;
-            const trainTime = new Date(t.time.replace(/-/g, '/'));
-            const diffMin = Math.round((trainTime - new Date()) / 60000);
-            
-            const hours = String(trainTime.getHours()).padStart(2, '0');
-            const mins = String(trainTime.getMinutes()).padStart(2, '0');
-            const clockTime = `${hours}:${mins}`;
-            
-            const timeText = diffMin <= 0 ? '即到' : `${diffMin} 分`;
-            const destColor = (t.dest === 'WKS' || destName === '烏溪沙') ? 'var(--accent-blue)' : 'var(--accent-purple)';
-
-            return `
-                <div class="mtr-card-4x1">
-                    <span style="font-size: 1.15rem; color: ${destColor}; font-weight: 800;">往 ${destName}</span>
-                    <div style="font-size: 2.1rem; color: var(--accent-green); font-weight: 900; margin: 2px 0;">${timeText}</div>
-                    <span style="font-size: 1.3rem; color: var(--accent-yellow); font-weight: bold;">${clockTime}</span>
-                </div>
-            `;
-        }
-
-        function getStoredBusRoutes() {
-            const saved = localStorage.getItem('custom_bus_routes');
-            if (saved) { try { return JSON.parse(saved); } catch (e) {} }
-            return [
-                { route: '85K', stop: '003345', name: '錦鞍苑往沙田' },
-                { route: '681', stop: '003345', name: '錦鞍苑往港島' }
-            ];
-        }
-
-        async function fetchBusETA() {
-            const container = document.getElementById('bus-eta-list');
-            const routes = getStoredBusRoutes();
-            if (routes.length === 0) {
-                container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">請新增巴士路線</div>';
-                return;
-            }
-
-            let htmlContent = '';
-            for (let i = 0; i < routes.length; i++) {
-                let r = routes[i];
-                try {
-                    let etas = [];
-                    for (let st = 1; st <= 2; st++) {
-                        const res = await fetch(`https://data.etabus.gov.hk/v1/transport/kmb/eta/${r.stop}/${r.route}/${st}`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data && data.data) etas = etas.concat(data.data);
-                        }
-                    }
-                    
-                    let top3Etas = [];
-                    if (etas && etas.length > 0) {
-                        const validEtas = etas.filter(e => e.eta);
-                        if (validEtas.length > 0) {
-                            validEtas.sort((a, b) => new Date(a.eta) - new Date(b.eta));
-                            const uniqueEtas = [];
-                            validEtas.forEach(e => {
-                                const eTime = new Date(e.eta).getTime();
-                                if (!uniqueEtas.some(existing => Math.abs(eTime - new Date(existing.eta).getTime()) < 60000)) {
-                                    uniqueEtas.push(e);
-                                }
-                            });
-                            top3Etas = uniqueEtas.slice(0, 3);
-                        }
-                    }
-
-                    let boxesHtml = '';
-                    for (let bIdx = 0; bIdx < 3; bIdx++) {
-                        const e = top3Etas[bIdx];
-                        if (e) {
-                            const nextTime = new Date(e.eta);
-                            const diffMin = Math.round((nextTime - new Date()) / 60000);
-                            const timeStr = diffMin <= 1 ? '將到' : `${diffMin} 分`;
-                            const clockTime = `${String(nextTime.getHours()).padStart(2, '0')}:${String(nextTime.getMinutes()).padStart(2, '0')}`;
-
-                            const rmkText = e.rmk_tc ? e.rmk_tc.trim() : '';
-                            
-                            // 判定特別車邏輯
-                            const isNormal = rmkText.includes('常規') || rmkText.includes('原定班次');
-                            const isSpecial = !isNormal && (
-                                (e.service_type > 1) || 
-                                rmkText.includes('下經') || 
-                                rmkText.includes('不經') || 
-                                rmkText.includes('特別') || 
-                                rmkText.includes('特快') || 
-                                rmkText.includes('改道') || 
-                                rmkText.includes('臨時')
-                            );
-
-                            const showRemark = rmkText && !rmkText.includes('原定班次') && !rmkText.includes('常規');
-
-                            boxesHtml += `
-                                <div class="bus-card-box">
-                                    <div style="font-size: 2.1rem; color: var(--accent-green); font-weight: 900;">${timeStr}</div>
-                                    <div style="font-size: 1.3rem; color: var(--accent-yellow); font-weight: bold; margin: 2px 0;">${clockTime}</div>
-                                    <span class="status-pill ${isSpecial ? 'pill-active-special' : 'pill-active-normal'}">${isSpecial ? '特別' : '普通'}</span>
-                                    ${showRemark ? `<div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px; line-height: 1.1; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${rmkText}">${rmkText}</div>` : ''}
-                                </div>
-                            `;
-                        } else {
-                            boxesHtml += `
-                                <div class="bus-card-box" style="opacity: 0.35; justify-content: center;">
-                                    <span style="font-size: 0.95rem; color: #9ca3af;">無班次</span>
-                                </div>
-                            `;
-                        }
-                    }
-
-                    htmlContent += `
-                        <div style="background: rgba(0,0,0,0.2); padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span class="route-badge">${r.route}</span>
-                                    ${r.name ? `<span style="font-size: 1.25rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
-                                </div>
-                                <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-weight:bold; font-size: 1.3rem;">✕</button>
-                            </div>
-                            <div class="bus-grid-3">
-                                ${boxesHtml}
-                            </div>
-                        </div>
-                    `;
-                } catch (err) {}
-            }
-            container.innerHTML = htmlContent;
-        }
-
-        function addBusRoute() {
-            const routeInput = document.getElementById('bus-route-input');
-            const stopInput = document.getElementById('bus-stop-input');
-            const nameInput = document.getElementById('bus-name-input');
-            
-            const routeVal = routeInput.value.trim().toUpperCase();
-            if (!routeVal) return;
-            
-            let routes = getStoredBusRoutes();
-            routes.push({ route: routeVal, stop: stopInput.value.trim() || '003345', name: nameInput.value.trim() });
-            localStorage.setItem('custom_bus_routes', JSON.stringify(routes));
-            
-            routeInput.value = ''; nameInput.value = '';
-            fetchBusETA();
-        }
-
-        function removeBusRoute(index) {
-            let routes = getStoredBusRoutes();
-            routes.splice(index, 1);
-            localStorage.setItem('custom_bus_routes', JSON.stringify(routes));
-            fetchBusETA();
-        }
-
-        // npoint.io 讀取備忘錄
-        async function loadMemosFromCloud() {
-            try {
-                const res = await fetch(NPOINT_URL);
+                const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
                 const data = await res.json();
-                if (Array.isArray(data)) {
-                    renderMemos(data);
-                    localStorage.setItem('cached_memos', JSON.stringify(data));
-                }
-            } catch (e) {
-                const cached = localStorage.getItem('cached_memos');
-                if (cached) renderMemos(JSON.parse(cached));
+                
+                const temp = data.temperature.data[0].value;
+                const humidity = data.humidity.data[0].value;
+                const rainfall = data.rainfall.data[0]?.max || 0;
+
+                weatherEl.innerHTML = `🌡️ 氣溫: ${temp}°C &nbsp;|&nbsp; 💧 濕度: ${humidity}% <br><span style="font-size:0.9rem; color:#94a3b8;">🌧️ 雨量: ${rainfall} mm</span>`;
+            } catch (err) {
+                weatherEl.textContent = '天氣數據讀取失敗';
             }
         }
 
-        // npoint.io 儲存備忘錄
-        async function saveMemosToCloud(memos) {
-            localStorage.setItem('cached_memos', JSON.stringify(memos));
+        // 4. 抓取香港恆生指數數據 (使用 Yahoo Finance API)
+        async function fetchHSI() {
+            const priceEl = document.getElementById('hsi-price');
+            const changeEl = document.getElementById('hsi-change');
+            const timeEl = document.getElementById('hsi-update-time');
+
             try {
-                await fetch(NPOINT_URL, {
-                    method: 'POST',
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(memos)
-                });
-            } catch (e) {}
+                const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EHSI?interval=1m&range=1d');
+                if (!res.ok) throw new Error('網絡數據讀取失敗');
+                
+                const data = await res.json();
+                const meta = data.chart.result[0].meta;
+                
+                const currentPrice = meta.regularMarketPrice;
+                const previousClose = meta.chartPreviousClose;
+                const change = currentPrice - previousClose;
+                const changePercent = (change / previousClose) * 100;
+                
+                const isPositive = change >= 0;
+                const sign = isPositive ? '+' : '';
+                const color = isPositive ? 'var(--accent-green)' : 'var(--accent-red)';
+
+                priceEl.textContent = currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                priceEl.style.color = '#ffffff';
+
+                changeEl.textContent = `${sign}${change.toFixed(2)} (${sign}${changePercent.toFixed(2)}%)`;
+                changeEl.style.color = color;
+
+                const now = new Date();
+                timeEl.textContent = `更新時間: ${now.toLocaleTimeString('zh-HK', { hour12: false })}`;
+            } catch (err) {
+                console.error('抓取恆指失敗:', err);
+                priceEl.textContent = '無法取得數據';
+                changeEl.textContent = '--';
+            }
+        }
+
+        // 5. 雲端備忘錄邏輯
+        async function loadMemosFromCloud() {
+            const memoList = document.getElementById('memo-list');
+            try {
+                if (NPOINT_URL.includes('YOUR_NPOINT_ID')) throw new Error('未設定 npoint');
+                
+                const res = await fetch(NPOINT_URL);
+                if (!res.ok) throw new Error('雲端讀取失敗');
+                const data = await res.json();
+                
+                let memos = Array.isArray(data) ? data : (data.memos || []);
+                renderMemos(memos);
+            } catch (err) {
+                const localData = localStorage.getItem('backup_memos');
+                renderMemos(localData ? JSON.parse(localData) : []);
+            }
         }
 
         function renderMemos(memos) {
-            const listEl = document.getElementById('memo-list');
-            if (!memos || memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">目前沒有備忘</div>';
+            const memoList = document.getElementById('memo-list');
+            localStorage.setItem('backup_memos', JSON.stringify(memos));
+            
+            if (memos.length === 0) {
+                memoList.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 6px;">暫無備忘事項</div>';
                 return;
             }
-            listEl.innerHTML = memos.map((text, index) => `
-                <div class="memo-item">
-                    <span>• ${text}</span>
-                    <div class="memo-actions">
-                        <button class="memo-action-btn" onclick="moveMemo(${index}, -1)" ${index === 0 ? 'style="opacity:0.3;pointer-events:none;"' : ''}>⬆</button>
-                        <button class="memo-action-btn" onclick="moveMemo(${index}, 1)" ${index === memos.length - 1 ? 'style="opacity:0.3;pointer-events:none;"' : ''}>⬇</button>
-                        <button class="memo-delete" onclick="deleteMemo(${index})">✕</button>
+
+            memoList.innerHTML = memos.map((item, index) => {
+                const text = typeof item === 'string' ? item : item.text;
+                return `
+                    <div class="memo-item">
+                        <span>${text}</span>
+                        <button class="memo-delete" onclick="deleteMemo(${index})" title="刪除">✕</button>
                     </div>
-                </div>
-            `).join('');
-            window.currentMemos = memos; 
+                `;
+            }).join('');
+        }
+
+        async function saveMemosToCloud(memos) {
+            renderMemos(memos);
+            try {
+                if (!NPOINT_URL.includes('YOUR_NPOINT_ID')) {
+                    await fetch(NPOINT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ memos: memos })
+                    });
+                }
+            } catch (err) {
+                console.error('儲存至雲端失敗:', err);
+            }
         }
 
         async function addMemo() {
             const input = document.getElementById('memo-input');
-            if (!input.value.trim()) return;
-            let memos = window.currentMemos || [];
-            memos.push(input.value.trim());
-            input.value = '';
-            renderMemos(memos);
-            await saveMemosToCloud(memos);
-        }
+            const text = input.value.trim();
+            if (!text) return;
 
-        async function moveMemo(index, direction) {
-            let memos = window.currentMemos || [];
-            const targetIndex = index + direction;
-            if (targetIndex < 0 || targetIndex >= memos.length) return;
-            const item = memos.splice(index, 1)[0];
-            memos.splice(targetIndex, 0, item);
-            renderMemos(memos);
-            await saveMemosToCloud(memos);
+            let currentMemos = [];
+            const localData = localStorage.getItem('backup_memos');
+            if (localData) currentMemos = JSON.parse(localData);
+
+            currentMemos.push({ text: text, createdAt: new Date().toISOString() });
+            input.value = '';
+            
+            await saveMemosToCloud(currentMemos);
         }
 
         async function deleteMemo(index) {
-            let memos = window.currentMemos || [];
-            memos.splice(index, 1);
-            renderMemos(memos);
-            await saveMemosToCloud(memos);
+            let currentMemos = [];
+            const localData = localStorage.getItem('backup_memos');
+            if (localData) currentMemos = JSON.parse(localData);
+
+            currentMemos.splice(index, 1);
+            await saveMemosToCloud(currentMemos);
         }
 
-        window.onload = function() {
-            updateTime();
-        };
-
-        setInterval(updateTime, 1000);
-        setInterval(fetchWeather, 600000); 
-        setInterval(fetchMTR, 30000);
-        setInterval(fetchBusETA, 30000);
-
-        updateTime(); 
+        // 初始化執行與定時刷新
+        updateTime();
         updateHolidayCountdown();
         fetchWeather();
-        loadMemosFromCloud(); 
-        fetchMTR();
-        fetchBusETA();
+        fetchHSI();
+        loadMemosFromCloud();
+
+        setInterval(updateTime, 1000);
+        setInterval(fetchWeather, 600000);       // 10分鐘更新天氣
+        setInterval(fetchHSI, 60000);            // 1分鐘更新恆指
+        setInterval(loadMemosFromCloud, 300000); // 5分鐘同步備忘
     </script>
 </body>
 </html>
