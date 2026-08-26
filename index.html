@@ -190,6 +190,7 @@
 <body>
 
     <div class="main-grid">
+        <!-- 左上：日期、農曆與大時鐘 -->
         <div class="panel panel-top-left">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div style="display: flex; align-items: baseline; gap: 12px;">
@@ -211,6 +212,7 @@
             </div>
         </div>
 
+        <!-- 右上：天氣資訊與假期倒數 -->
         <div class="panel">
             <div class="wx-box">
                 <div style="display: flex; align-items: center; gap: 18px;">
@@ -239,6 +241,7 @@
             </div>
         </div>
 
+        <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 (npoint.io) -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
@@ -258,6 +261,7 @@
             </div>
         </div>
 
+        <!-- 右下：九巴實時到站 (2行 x 每行3格班次) -->
         <div class="panel">
             <div class="transit-input-box">
                 <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
@@ -272,8 +276,8 @@
     </div>
 
     <script>
-        const BIN_ID = "6a87123ada38895dfefbc1ca"; 
-        const MASTER_KEY = "$2a$10$HvcOoQBCbmfplG2XSkexuOAFTbJfJzpuucJSOImKmhiM3K//7f5kO";
+        // npoint.io 設定
+        const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
 
         const hkHolidays = [
             { name: "中秋節翌日", date: "2026-09-28" },
@@ -546,7 +550,6 @@
                                 rmkText.includes('臨時')
                             );
 
-                            // 隱藏「原定班次」與「常規」顯示，只保留特定提示
                             const showRemark = rmkText && !rmkText.includes('原定班次') && !rmkText.includes('常規');
 
                             boxesHtml += `
@@ -608,13 +611,14 @@
             fetchBusETA();
         }
 
+        // npoint.io 讀取備忘錄
         async function loadMemosFromCloud() {
             try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": MASTER_KEY } });
+                const res = await fetch(NPOINT_URL);
                 const data = await res.json();
-                if (Array.isArray(data.record)) {
-                    renderMemos(data.record);
-                    localStorage.setItem('cached_memos', JSON.stringify(data.record));
+                if (Array.isArray(data)) {
+                    renderMemos(data);
+                    localStorage.setItem('cached_memos', JSON.stringify(data));
                 }
             } catch (e) {
                 const cached = localStorage.getItem('cached_memos');
@@ -622,12 +626,13 @@
             }
         }
 
+        // npoint.io 儲存備忘錄
         async function saveMemosToCloud(memos) {
             localStorage.setItem('cached_memos', JSON.stringify(memos));
             try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                await fetch(NPOINT_URL, {
+                    method: 'POST',
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(memos)
                 });
             } catch (e) {}
@@ -683,13 +688,11 @@
             updateTime();
         };
 
-        // 定時刷新（備忘錄已改為僅在啟動及手動時載入，不進行定時請求）
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000); 
         setInterval(fetchMTR, 30000);
         setInterval(fetchBusETA, 30000);
 
-        // 初始執行
         updateTime(); 
         updateHolidayCountdown();
         fetchWeather();
