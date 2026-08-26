@@ -2,12 +2,12 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人資訊儀表板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>桌面資訊儀表板 (橫向版)</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --bg-color: #0b132b;
+            --card-bg: rgba(28, 37, 65, 0.7);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --accent-green: #10b981;
@@ -20,165 +20,235 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-primary);
-            padding: 20px;
+            padding: 12px;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             display: flex;
+            align-items: center;
             justify-content: center;
-            min-height: 100vh;
         }
 
-        .container {
+        /* 橫向雙欄佈局 */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             width: 100%;
-            max-width: 600px;
+            height: 100%;
+            max-width: 1000px;
+            max-height: 600px;
+        }
+
+        .column {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
+            height: 100%;
         }
 
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        /* 時間與倒數卡片 */
-        .time-box {
+        /* 左側：大時間與日期 */
+        .time-card {
+            flex: 2;
             text-align: center;
+            background: linear-gradient(135deg, rgba(28, 37, 65, 0.9), rgba(11, 19, 43, 0.9));
         }
+
         #clock {
-            font-size: 2.8rem;
-            font-weight: 700;
-            letter-spacing: 2px;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
         }
+
         #date {
             font-size: 1.1rem;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 6px;
         }
+
         #countdown {
-            margin-top: 12px;
-            font-size: 0.95rem;
+            margin-top: 8px;
+            font-size: 0.85rem;
             color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* 天氣卡片 */
+        .weather-card {
+            flex: 1;
         }
 
         /* 恆指卡片 */
-        .hsi-header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 12px;
+        .hsi-card {
+            flex: 1;
         }
+
         .hsi-body {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            border-radius: 12px;
-        }
-        #hsi-price {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-        #hsi-change {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        .update-time {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            text-align: right;
-            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-top: 6px;
         }
 
-        /* 雲端備忘錄 */
+        #hsi-price {
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        #hsi-change {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .update-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* 備忘錄卡片 */
+        .memo-card {
+            flex: 2;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
         .memo-input-group {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 8px;
+            margin-top: 6px;
         }
+
         .memo-input-group input {
             flex: 1;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.25);
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.9rem;
             outline: none;
+            -webkit-user-select: text;
+            user-select: text;
         }
+
         .memo-input-group button {
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 8px 14px;
+            border-radius: 6px;
             border: none;
             background: var(--accent-blue);
             color: #fff;
             font-weight: bold;
             cursor: pointer;
         }
+
+        #memo-list {
+            overflow-y: auto;
+            max-height: 120px;
+            padding-right: 4px;
+        }
+
         .memo-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
+
         .memo-delete {
             background: none;
             border: none;
             color: var(--accent-red);
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
+            padding: 0 4px;
+        }
+
+        /* 標題共用樣式 */
+        .card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- 時間與假期倒數 -->
-        <div class="card time-box">
-            <div id="clock">00:00:00</div>
-            <div id="date">加載中...</div>
-            <div id="countdown">假期倒數：計算中...</div>
-        </div>
-
-        <!-- 天氣資訊 -->
-        <div class="card">
-            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;">香港即時天氣</div>
-            <div id="weather-info" style="font-size: 1.1rem;">載入天氣數據中...</div>
-        </div>
-
-        <!-- 香港恆生指數卡片 -->
-        <div class="card">
-            <div class="hsi-header">香港恆生指數 (HSI)</div>
-            <div class="hsi-body">
-                <div id="hsi-price">載入中...</div>
-                <div id="hsi-change">--</div>
+    <div class="dashboard-container">
+        <!-- 左欄：時間、日期、天氣 -->
+        <div class="column">
+            <div class="card time-card">
+                <div id="clock">00:00:00</div>
+                <div id="date">加載中...</div>
+                <div><span id="countdown">假期倒數：計算中...</span></div>
             </div>
-            <div id="hsi-update-time" class="update-time">更新時間: --</div>
+
+            <div class="card weather-card">
+                <div class="card-title">香港即時天氣</div>
+                <div id="weather-info" style="font-size: 1rem; margin-top: 6px;">載入天氣數據中...</div>
+            </div>
         </div>
 
-        <!-- 雲端備忘錄 -->
-        <div class="card">
-            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 12px;">備忘錄</div>
-            <div class="memo-input-group">
-                <input type="text" id="memo-input" placeholder="新增事項..." onkeypress="if(event.key==='Enter') addMemo()">
-                <button onclick="addMemo()">新增</button>
+        <!-- 右欄：恆指、備忘錄 -->
+        <div class="column">
+            <div class="card hsi-card">
+                <div class="card-title">香港恆生指數 (HSI)</div>
+                <div class="hsi-body">
+                    <div id="hsi-price">載入中...</div>
+                    <div id="hsi-change">--</div>
+                </div>
+                <div id="hsi-update-time" class="update-time">更新時間: --</div>
             </div>
-            <div id="memo-list"></div>
+
+            <div class="card memo-card">
+                <div class="card-title">桌面備忘錄</div>
+                <div class="memo-input-group">
+                    <input type="text" id="memo-input" placeholder="新增待辦..." onkeypress="if(event.key==='Enter') addMemo()">
+                    <button onclick="addMemo()">新增</button>
+                </div>
+                <div id="memo-list"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 設定你的 npoint.io URL (如果有的話)
         const NPOINT_URL = 'https://api.npoint.io/YOUR_NPOINT_ID';
 
         // 1. 時鐘與日期
@@ -190,13 +260,12 @@
             document.getElementById('date').textContent = now.toLocaleDateString('zh-HK', options);
         }
 
-        // 2. 假期倒數範例 (可自行更換日期與名稱)
+        // 2. 假期倒數
         function updateHolidayCountdown() {
             const now = new Date();
             const currentYear = now.getFullYear();
             
-            // 預設倒數：國慶日 (10月1日)
-            let nextHoliday = new Date(currentYear, 9, 1); 
+            let nextHoliday = new Date(currentYear, 9, 1); // 10月1日國慶
             if (now > nextHoliday) {
                 nextHoliday = new Date(currentYear + 1, 9, 1);
             }
@@ -204,10 +273,10 @@
             const diffTime = nextHoliday - now;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            document.getElementById('countdown').textContent = `距離下一個主要假期 (10月1日)：仲有 ${diffDays} 天`;
+            document.getElementById('countdown').textContent = `距離 10月1日 假期：仲有 ${diffDays} 天`;
         }
 
-        // 3. 抓取天文台天氣 API
+        // 3. 香港天文台天氣
         async function fetchWeather() {
             const weatherEl = document.getElementById('weather-info');
             try {
@@ -218,13 +287,13 @@
                 const humidity = data.humidity.data[0].value;
                 const rainfall = data.rainfall.data[0]?.max || 0;
 
-                weatherEl.innerHTML = `🌡️ 氣溫: ${temp}°C &nbsp;|&nbsp; 💧 濕度: ${humidity}% <br><span style="font-size:0.9rem; color:#94a3b8;">🌧️ 雨量: ${rainfall} mm</span>`;
+                weatherEl.innerHTML = `🌡️ 氣溫: <b>${temp}°C</b> &nbsp;|&nbsp; 💧 濕度: <b>${humidity}%</b><br><span style="font-size:0.85rem; color:#94a3b8;">🌧️ 今日降雨量: ${rainfall} mm</span>`;
             } catch (err) {
                 weatherEl.textContent = '天氣數據讀取失敗';
             }
         }
 
-        // 4. 抓取香港恆生指數數據 (使用 Yahoo Finance API)
+        // 4. 香港恆生指數 (Yahoo Finance API)
         async function fetchHSI() {
             const priceEl = document.getElementById('hsi-price');
             const changeEl = document.getElementById('hsi-change');
@@ -261,7 +330,7 @@
             }
         }
 
-        // 5. 雲端備忘錄邏輯
+        // 5. 雲端備忘錄
         async function loadMemosFromCloud() {
             const memoList = document.getElementById('memo-list');
             try {
@@ -284,7 +353,7 @@
             localStorage.setItem('backup_memos', JSON.stringify(memos));
             
             if (memos.length === 0) {
-                memoList.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 6px;">暫無備忘事項</div>';
+                memoList.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 6px; font-size: 0.85rem;">暫無待辦事項</div>';
                 return;
             }
 
@@ -338,7 +407,7 @@
             await saveMemosToCloud(currentMemos);
         }
 
-        // 初始化執行與定時刷新
+        // 初始化與定時更新
         updateTime();
         updateHolidayCountdown();
         fetchWeather();
