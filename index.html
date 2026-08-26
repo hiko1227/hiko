@@ -15,7 +15,7 @@
             --accent-purple: #c084fc;
             --accent-orange: #f59e0b;
             --accent-red: #f87171;
-            --accent-pink: #f472b6; /* 新增粉紅色 */
+            --accent-pink: #f472b6;
         }
 
         body.light-mode {
@@ -28,7 +28,7 @@
             --accent-purple: #7c3aed;
             --accent-orange: #d97706;
             --accent-red: #dc2626;
-            --accent-pink: #db2777; /* Light 模式下的粉紅色 */
+            --accent-pink: #db2777;
         }
         
         body { 
@@ -119,6 +119,7 @@
         .memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.4rem; padding: 0 6px; }
         
         .refresh-memo-btn { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
+        .refresh-memo-btn:active { background: rgba(255, 255, 255, 0.25); }
 
         .transit-container { display: flex; flex-direction: column; gap: 10px; }
 
@@ -189,7 +190,6 @@
 <body>
 
     <div class="main-grid">
-        <!-- 左上：日期、農曆與大時鐘 -->
         <div class="panel panel-top-left">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <div style="display: flex; align-items: baseline; gap: 12px;">
@@ -211,7 +211,6 @@
             </div>
         </div>
 
-        <!-- 右上：天氣資訊與假期倒數 -->
         <div class="panel">
             <div class="wx-box">
                 <div style="display: flex; align-items: center; gap: 18px;">
@@ -240,7 +239,6 @@
             </div>
         </div>
 
-        <!-- 左下：港鐵恆安站 (4x1 橫排) + 雲端備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
@@ -248,19 +246,18 @@
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 6px;">
                 <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 同步雲端</button>
+                    <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 手動同步雲端</button>
                 </div>
                 <div class="memo-input-box">
                     <input type="text" id="memo-input" class="memo-input" placeholder="新增備忘事項..." onkeypress="if(event.key==='Enter')addMemo()">
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">正在連接雲端...</div>
+                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">正在讀取備忘...</div>
                 </div>
             </div>
         </div>
 
-        <!-- 右下：九巴實時到站 (2行 x 每行3格班次) -->
         <div class="panel">
             <div class="transit-input-box">
                 <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
@@ -549,12 +546,15 @@
                                 rmkText.includes('臨時')
                             );
 
+                            // 隱藏「原定班次」與「常規」顯示，只保留特定提示
+                            const showRemark = rmkText && !rmkText.includes('原定班次') && !rmkText.includes('常規');
+
                             boxesHtml += `
                                 <div class="bus-card-box">
                                     <div style="font-size: 2.1rem; color: var(--accent-green); font-weight: 900;">${timeStr}</div>
                                     <div style="font-size: 1.3rem; color: var(--accent-yellow); font-weight: bold; margin: 2px 0;">${clockTime}</div>
                                     <span class="status-pill ${isSpecial ? 'pill-active-special' : 'pill-active-normal'}">${isSpecial ? '特別' : '普通'}</span>
-                                    ${rmkText ? `<div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px; line-height: 1.1; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${rmkText}">${rmkText}</div>` : ''}
+                                    ${showRemark ? `<div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px; line-height: 1.1; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${rmkText}">${rmkText}</div>` : ''}
                                 </div>
                             `;
                         } else {
@@ -635,7 +635,7 @@
 
         function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
-            if (memos.length === 0) {
+            if (!memos || memos.length === 0) {
                 listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">目前沒有備忘</div>';
                 return;
             }
@@ -683,12 +683,13 @@
             updateTime();
         };
 
+        // 定時刷新（備忘錄已改為僅在啟動及手動時載入，不進行定時請求）
         setInterval(updateTime, 1000);
         setInterval(fetchWeather, 600000); 
-        setInterval(loadMemosFromCloud, 30000); 
         setInterval(fetchMTR, 30000);
         setInterval(fetchBusETA, 30000);
 
+        // 初始執行
         updateTime(); 
         updateHolidayCountdown();
         fetchWeather();
