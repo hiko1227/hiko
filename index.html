@@ -2,132 +2,707 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人基金投資組合 Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>公司桌面資訊儀表板</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; }
-        .card .value { font-size: 24px; font-weight: bold; }
-        table { width: 100%; background: white; border-collapse: collapse; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #0070e0; color: white; font-weight: 500; }
-        .positive { color: #00875a; font-weight: bold; }
-        .negative { color: #de350b; font-weight: bold; }
-        button { background-color: #0070e0; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        button:hover { background-color: #0056b3; }
+        :root {
+            --bg-color: #0b132b;
+            --card-bg: rgba(28, 37, 65, 0.7);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-warn: #f59e0b;
+            --accent-pink: #f472b6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 10px;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+            max-width: 1000px;
+            max-height: 600px;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 左側：時間、農曆/節氣 */
+        .time-card {
+            flex: 1.2;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(28, 37, 65, 0.9), rgba(11, 19, 43, 0.9));
+        }
+
+        #clock {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        #lunar-info {
+            font-size: 0.8rem;
+            color: #60a5fa;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+
+        #countdown {
+            margin-top: 4px;
+            font-size: 0.75rem;
+            color: var(--accent-warn);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* 放工進度條與貓咪卡片 */
+        .work-cat-card {
+            flex: 1.1;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            justify-content: space-between;
+            padding: 8px 12px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+            margin: 4px 0;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .cat-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 8px;
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+
+        .cat-avatar {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .cat-speech {
+            font-size: 0.8rem;
+            color: #f472b6;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* 天氣卡片 */
+        .weather-card {
+            flex: 1;
+        }
+
+        .weather-alert {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        /* 替換：基金監控卡片樣式 */
+        .fund-card {
+            flex: 1.4;
+            justify-content: space-between;
+        }
+
+        .fund-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .fund-total {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .fund-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .fund-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .fund-name {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .fund-allocation {
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+        }
+
+        .fund-val {
+            font-weight: bold;
+        }
+
+        .update-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* 匯率卡片 */
+        .fx-card {
+            flex: 2;
+            justify-content: space-between;
+        }
+
+        .fx-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .fx-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .fx-item.active {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: var(--accent-blue);
+        }
+
+        .fx-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .fx-rate {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .fx-converter {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 5px 8px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fx-converter input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            width: 65px;
+            text-align: right;
+            outline: none;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .swap-btn {
+            background: var(--accent-blue);
+            border: none;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>📊 基金每日表現 Dashboard</h2>
-        <button onclick="fetchPrices()">🔄 重新整理數據</button>
+    <div class="dashboard-container">
+        <!-- 左欄：時間、放工進度/貓咪陪伴、天氣 -->
+        <div class="column">
+            <div class="card time-card">
+                <div id="clock">00:00:00</div>
+                <div id="date">加載中...</div>
+                <div id="lunar-info">農曆計算中...</div>
+                <div><span id="countdown">假期倒數：計算中...</span></div>
+            </div>
+
+            <div class="card work-cat-card" onclick="setWorkHours()">
+                <div>
+                    <div class="progress-header">
+                        <span>今日放工進度</span>
+                        <span id="work-percent" style="font-weight: bold; color: #10b981;">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="work-bar"></div>
+                    </div>
+                </div>
+
+                <div class="cat-box">
+                    <div class="cat-avatar" id="cat-icon">🐱</div>
+                    <div>
+                        <div style="font-size: 0.68rem; color: var(--text-secondary);">貓咪主子提醒你：</div>
+                        <div class="cat-speech" id="cat-text">記得飲水伸展下～</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card weather-card">
+                <div class="card-title">香港即時天氣</div>
+                <div id="weather-info" style="font-size: 1.05rem; margin-top: 2px; line-height: 1.3;">載入天氣數據中...</div>
+                <div id="weather-alerts"></div>
+            </div>
+        </div>
+
+        <!-- 右欄：替換為 基金組合監控、即時匯率 -->
+        <div class="column">
+            <div class="card fund-card">
+                <div class="card-title">
+                    <span>宏利投資組合 (MI Plus)</span>
+                    <span id="fund-update-time" class="update-time">更新中...</span>
+                </div>
+                <div class="fund-header">
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">估算保單總值：</span>
+                    <span class="fund-total" id="fund-total-val">$19,412.98 USD</span>
+                </div>
+
+                <div class="fund-list">
+                    <div class="fund-row">
+                        <div>
+                            <div class="fund-name">50% 核心大盤 (VOO)</div>
+                            <div class="fund-allocation">估值: $9,706.49 USD</div>
+                        </div>
+                        <div id="status-VOO" class="fund-val">--</div>
+                    </div>
+
+                    <div class="fund-row">
+                        <div>
+                            <div class="fund-name">30% 科技高增長 (QQQ)</div>
+                            <div class="fund-allocation">估值: $5,823.89 USD</div>
+                        </div>
+                        <div id="status-QQQ" class="fund-val">--</div>
+                    </div>
+
+                    <div class="fund-row">
+                        <div>
+                            <div class="fund-name">20% 防守現金基金</div>
+                            <div class="fund-allocation">估值: $3,882.60 USD</div>
+                        </div>
+                        <div class="fund-val" style="color:#10b981;">$1.124 (+0.01%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card fx-card">
+                <div class="card-title">
+                    <span>即時外幣牌價 (兌 HKD)</span>
+                    <span id="fx-update-time" style="font-size: 0.7rem; font-weight: normal;">更新中...</span>
+                </div>
+
+                <div class="fx-grid">
+                    <div class="fx-item active" id="item-USD" onclick="selectCurrency('USD')">
+                        <span class="fx-name">USD 美元</span>
+                        <span class="fx-rate" id="rate-USD">--</span>
+                    </div>
+                    <div class="fx-item" id="item-EUR" onclick="selectCurrency('EUR')">
+                        <span class="fx-name">EUR 歐元</span>
+                        <span class="fx-rate" id="rate-EUR">--</span>
+                    </div>
+                    <div class="fx-item" id="item-GBP" onclick="selectCurrency('GBP')">
+                        <span class="fx-name">GBP 英鎊</span>
+                        <span class="fx-rate" id="rate-GBP">--</span>
+                    </div>
+                    <div class="fx-item" id="item-CHF" onclick="selectCurrency('CHF')">
+                        <span class="fx-name">CHF 瑞郎</span>
+                        <span class="fx-rate" id="rate-CHF">--</span>
+                    </div>
+                    <div class="fx-item" id="item-JPY" onclick="selectCurrency('JPY')">
+                        <span class="fx-name">JPY 日圓</span>
+                        <span class="fx-rate" id="rate-JPY">--</span>
+                    </div>
+                    <div class="fx-item" id="item-AUD" onclick="selectCurrency('AUD')">
+                        <span class="fx-name">AUD 澳元</span>
+                        <span class="fx-rate" id="rate-AUD">--</span>
+                    </div>
+                    <div class="fx-item" id="item-KRW" onclick="selectCurrency('KRW')" style="grid-column: span 2;">
+                        <span class="fx-name">KRW 韓圓 (WON)</span>
+                        <span class="fx-rate" id="rate-KRW">--</span>
+                    </div>
+                </div>
+
+                <div class="fx-converter">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span id="fx-dir-label" style="font-size: 0.75rem; color: #60a5fa; font-weight: bold;">USD ➜ HKD</span>
+                        <button class="swap-btn" onclick="toggleDirection()">⇄</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <input type="number" id="fx-amount" value="100" oninput="calculateFX()">
+                        <span id="fx-result" style="font-size: 0.9rem; font-weight: bold; color: #10b981;">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 總資產概覽卡片 -->
-    <div class="card-grid">
-        <div class="card">
-            <h3>保單總估值 (USD)</h3>
-            <div class="value" id="total-val">$19,412.98</div>
-        </div>
-        <div class="card">
-            <h3>核心大盤 (50%)</h3>
-            <div class="value" id="core-val">$9,706.49</div>
-        </div>
-        <div class="card">
-            <h3>科技/高增長 (30%)</h3>
-            <div class="value" id="growth-val">$5,823.89</div>
-        </div>
-        <div class="card">
-            <h3>現金防守 (20%)</h3>
-            <div class="value" id="cash-val">$3,882.60</div>
-        </div>
-    </div>
+    <script>
+        let fxRates = { USD: 0, EUR: 0, GBP: 0, CHF: 0, JPY: 0, AUD: 0, KRW: 0 };
+        let selectedCurr = 'USD';
+        let isForeignToHkd = true;
 
-    <!-- 基金實時數據表 -->
-    <table>
-        <thead>
-            <tr>
-                <th>配置種類</th>
-                <th>追蹤指標 / 基金代碼</th>
-                <th>最新價格/淨值</th>
-                <th>今日變動</th>
-                <th>狀態</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><b>50% 核心大盤</b></td>
-                <td>標普 500 指數 (VOO)</td>
-                <td id="price-VOO">加載中...</td>
-                <td id="change-VOO">--</td>
-                <td id="status-VOO">--</td>
-            </tr>
-            <tr>
-                <td><b>30% 科技高增長</b></td>
-                <td>納斯達克 100 / 半導體 (QQQ)</td>
-                <td id="price-QQQ">加載中...</td>
-                <td id="change-QQQ">--</td>
-                <td id="status-QQQ">--</td>
-            </tr>
-            <tr>
-                <td><b>20% 防守現金</b></td>
-                <td>宏利現金基金 (美元)</td>
-                <td>$1.124</td>
-                <td class="positive">+0.01%</td>
-                <td>穩定浮動</td>
-            </tr>
-        </tbody>
-    </table>
-    <p style="font-size: 12px; color: #888; margin-top: 10px;">* 數據每 60 秒可手動刷新一次，主要大盤指標同步美股市場最新走勢。</p>
-</div>
+        let workStartHour = parseInt(localStorage.getItem('workStart') || 9);
+        let workEndHour = parseInt(localStorage.getItem('workEnd') || 18);
 
-<script>
-// 利用 Yahoo Finance API 自動獲取實時數據
-async function fetchPrices() {
-    const symbols = ['VOO', 'QQQ'];
-    
-    for (let symbol of symbols) {
-        try {
-            // 使用免費 CORS 代理請求數據
-            const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`);
-            const data = await response.json();
-            const meta = data.chart.result[0].meta;
+        // 1. 時鐘與西曆日期
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('zh-HK', { hour12: false });
             
-            const price = meta.regularMarketPrice.toFixed(2);
-            const prevClose = meta.chartPreviousClose;
-            const changePercent = (((price - prevClose) / prevClose) * 100).toFixed(2);
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-HK', options);
 
-            // 更新 HTML
-            document.getElementById(`price-${symbol}`).innerText = `$${price}`;
-            
-            const changeEl = document.getElementById(`change-${symbol}`);
-            const statusEl = document.getElementById(`status-${symbol}`);
-            
-            if (changePercent >= 0) {
-                changeEl.innerText = `+${changePercent}%`;
-                changeEl.className = 'positive';
-                statusEl.innerText = '📈 上升';
-            } else {
-                changeEl.innerText = `${changePercent}%`;
-                changeEl.className = 'negative';
-                statusEl.innerText = '📉 調整';
-            }
-        } catch (error) {
-            document.getElementById(`price-${symbol}`).innerText = "需手動更新";
-            document.getElementById(`change-${symbol}`).innerText = "N/A";
+            updateWorkProgress(now);
         }
-    }
-}
 
-// 頁面加載時自動執行一次
-window.onload = fetchPrices;
-</script>
+        // 2. 放工進度條與貓咪對話
+        function updateWorkProgress(now) {
+            const currentHour = now.getHours() + now.getMinutes() / 60;
+            const totalWorkHours = workEndHour - workStartHour;
+            
+            let percent = 0;
+            let catText = "主子加油，今日都要順順利利！";
+            let catIcon = "😸";
 
+            if (currentHour < workStartHour) {
+                percent = 0;
+                catText = "準備返工，飲杯咖啡先！☕";
+                catIcon = "😺";
+            } else if (currentHour >= workEndHour) {
+                percent = 100;
+                catText = "🎉 恭喜放工！辛苦啦，快啲返屋企啦！";
+                catIcon = "😻";
+            } else {
+                const elapsed = currentHour - workStartHour;
+                percent = Math.min(100, Math.max(0, (elapsed / totalWorkHours) * 100));
+
+                if (now.getHours() === 12 || now.getHours() === 13) {
+                    catText = "🍱 食飯時間到！記得食飽啲呀！";
+                    catIcon = "😸";
+                } else if (percent > 75) {
+                    catText = "快放工啦！最後衝刺！💪";
+                    catIcon = "😽";
+                } else if (percent > 40) {
+                    catText = "坐太久啦，起身伸展下、飲杯水！💧";
+                    catIcon = "🐾";
+                }
+            }
+
+            document.getElementById('work-percent').textContent = `${percent.toFixed(0)}%`;
+            document.getElementById('work-bar').style.width = `${percent}%`;
+            document.getElementById('cat-text').textContent = catText;
+            document.getElementById('cat-icon').textContent = catIcon;
+        }
+
+        function setWorkHours() {
+            const start = prompt("請輸入上班時間 (0-23):", workStartHour);
+            const end = prompt("請輸入放工時間 (0-23):", workEndHour);
+            if (start !== null && end !== null) {
+                workStartHour = parseInt(start) || 9;
+                workEndHour = parseInt(end) || 18;
+                localStorage.setItem('workStart', workStartHour);
+                localStorage.setItem('workEnd', workEndHour);
+                updateTime();
+            }
+        }
+
+        // 3. 農曆與節氣轉換計算
+        function updateLunarDate() {
+            try {
+                const now = new Date();
+                const lunarText = new Intl.DateTimeFormat('zh-TN-u-ca-chinese', { day: 'numeric', month: 'long' }).format(now);
+                const month = now.getMonth() + 1;
+                const day = now.getDate();
+                let solarTerm = "";
+
+                const terms = {
+                    1: { 5: "小寒", 20: "大寒" }, 2: { 4: "立春", 19: "雨水" },
+                    3: { 5: "驚蟄", 20: "春分" }, 4: { 4: "清明", 19: "穀雨" },
+                    5: { 5: "立夏", 20: "小滿" }, 6: { 5: "芒種", 21: "夏至" },
+                    7: { 7: "小暑", 22: "大暑" }, 8: { 7: "立秋", 23: "處暑" },
+                    9: { 7: "白露", 22: "秋分" }, 10: { 8: "寒露", 23: "霜降" },
+                    11: { 7: "立冬", 22: "小雪" }, 12: { 7: "大雪", 21: "冬至" }
+                };
+
+                if (terms[month]) {
+                    for (let d in terms[month]) {
+                        if (Math.abs(day - parseInt(d)) <= 1) {
+                            solarTerm = ` · 【${terms[month][d]}】`;
+                            break;
+                        }
+                    }
+                }
+                document.getElementById('lunar-info').textContent = `農曆 ${lunarText}${solarTerm}`;
+            } catch (e) {
+                document.getElementById('lunar-info').textContent = '';
+            }
+        }
+
+        // 4. 香港公眾假期倒數
+        function updateHolidayCountdown() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const holidays = [
+                { name: "中秋節後翌日", date: new Date(year, 8, 26) },
+                { name: "國慶日", date: new Date(year, 9, 1) },
+                { name: "重陽節", date: new Date(year, 9, 19) },
+                { name: "聖誕節", date: new Date(year, 11, 25) },
+                { name: "元旦", date: new Date(year + 1, 0, 1) }
+            ];
+
+            let nextHoliday = holidays.find(h => h.date >= now);
+            if (!nextHoliday) nextHoliday = { name: "元旦", date: new Date(year + 1, 0, 1) };
+
+            const diffDays = Math.ceil((nextHoliday.date - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('countdown').textContent = `距離 ${nextHoliday.name}：仲有 ${diffDays} 天`;
+        }
+
+        // 5. 天文台天氣
+        async function fetchWeather() {
+            const weatherEl = document.getElementById('weather-info');
+            const alertsEl = document.getElementById('weather-alerts');
+
+            try {
+                const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
+                const data = await res.json();
+                
+                const temp = data.temperature.data[0].value;
+                const humidity = data.humidity.data[0].value;
+                const rainfall = data.rainfall.data[0]?.max || 0;
+
+                weatherEl.innerHTML = `🌡️ <b>${temp}°C</b> &nbsp;|&nbsp; 💧 <b>${humidity}%</b><br><span style="font-size:0.75rem; color:#94a3b8;">🌧️ 今日降雨量: ${rainfall} mm</span>`;
+
+                const warnRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+                const warnData = await warnRes.json();
+                
+                let alertHtml = '';
+                if (warnData && Object.keys(warnData).length > 0) {
+                    for (const key in warnData) {
+                        if (warnData[key].name) alertHtml += `<span class="weather-alert">⚠️ ${warnData[key].name}</span> `;
+                    }
+                }
+                alertsEl.innerHTML = alertHtml || '<span style="font-size:0.75rem; color:#10b981; margin-top:2px; display:block;">現時無特別天氣警告</span>';
+            } catch (err) {
+                weatherEl.textContent = '天氣數據讀取失敗';
+            }
+        }
+
+        // 6. 新增：基金與大盤指數獲取
+        async function fetchFunds() {
+            const timeEl = document.getElementById('fund-update-time');
+            const symbols = ['VOO', 'QQQ'];
+
+            for (let symbol of symbols) {
+                try {
+                    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`);
+                    const data = await res.json();
+                    const meta = data.chart.result[0].meta;
+
+                    const price = meta.regularMarketPrice.toFixed(2);
+                    const prevClose = meta.chartPreviousClose;
+                    const changePercent = (((price - prevClose) / prevClose) * 100).toFixed(2);
+
+                    const statusEl = document.getElementById(`status-${symbol}`);
+                    if (changePercent >= 0) {
+                        statusEl.innerHTML = `<span style="color: #10b981;">$${price} (+${changePercent}%)</span>`;
+                    } else {
+                        statusEl.innerHTML = `<span style="color: #ef4444;">$${price} (${changePercent}%)</span>`;
+                    }
+                } catch (err) {
+                    document.getElementById(`status-${symbol}`).textContent = '市況更新中';
+                }
+            }
+
+            const now = new Date();
+            timeEl.textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 更新`;
+        }
+
+        // 7. 外幣匯率
+        async function fetchFX() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/HKD');
+                const data = await res.json();
+
+                if (data && data.rates) {
+                    for (let key in fxRates) {
+                        if (data.rates[key]) {
+                            fxRates[key] = 1 / data.rates[key];
+                            const rateEl = document.getElementById(`rate-${key}`);
+                            if (rateEl) {
+                                const decimals = (key === 'JPY' || key === 'KRW') ? 4 : 3;
+                                rateEl.textContent = fxRates[key].toFixed(decimals);
+                            }
+                        }
+                    }
+                    const now = new Date();
+                    document.getElementById('fx-update-time').textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')} 更新`;
+                    calculateFX();
+                }
+            } catch (err) {
+                console.error('匯率數據讀取失敗:', err);
+            }
+        }
+
+        function selectCurrency(curr) {
+            selectedCurr = curr;
+            document.querySelectorAll('.fx-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`item-${curr}`).classList.add('active');
+            calculateFX();
+        }
+
+        function toggleDirection() {
+            isForeignToHkd = !isForeignToHkd;
+            calculateFX();
+        }
+
+        function calculateFX() {
+            const amount = parseFloat(document.getElementById('fx-amount').value) || 0;
+            const rate = fxRates[selectedCurr];
+            const dirLabel = document.getElementById('fx-dir-label');
+            const resultEl = document.getElementById('fx-result');
+
+            if (!rate) {
+                resultEl.textContent = "載入中...";
+                return;
+            }
+
+            if (isForeignToHkd) {
+                dirLabel.textContent = `${selectedCurr} ➜ HKD`;
+                const totalHKD = amount * rate;
+                resultEl.textContent = `$${totalHKD.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} HKD`;
+            } else {
+                dirLabel.textContent = `HKD ➜ ${selectedCurr}`;
+                const totalForeign = amount / rate;
+                resultEl.textContent = `${totalForeign.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ${selectedCurr}`;
+            }
+        }
+
+        // 初始化與定時器
+        updateTime();
+        updateLunarDate();
+        updateHolidayCountdown();
+        fetchWeather();
+        fetchFunds();
+        fetchFX();
+
+        setInterval(updateTime, 1000);
+        setInterval(fetchWeather, 600000);
+        setInterval(fetchFunds, 60000);
+        setInterval(fetchFX, 1800000);
+    </script>
 </body>
 </html>
