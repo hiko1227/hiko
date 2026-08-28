@@ -88,11 +88,11 @@
         .bobo-widget {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             background: var(--bobo-bubble-bg);
             border: 1px solid var(--accent-blue);
             border-radius: 12px;
-            padding: 10px 14px;
+            padding: 8px 14px;
             cursor: pointer;
             user-select: none;
             transition: transform 0.1s ease;
@@ -100,9 +100,12 @@
         .bobo-widget:active {
             transform: scale(0.98);
         }
-        .bobo-avatar {
-            font-size: 2.2rem;
-            line-height: 1;
+        .bobo-avatar-img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+            flex-shrink: 0;
         }
         .bobo-dialog {
             flex: 1;
@@ -275,11 +278,11 @@
             </div>
         </div>
 
-        <!-- 右上：寶寶對話助手 + 天氣資訊與假期倒數 -->
+        <!-- 右上：寶寶圖片對話助手 + 天氣資訊與假期倒數 -->
         <div class="panel">
-            <!-- 🐱 寶寶小助手區塊 (點擊可切換對話) -->
+            <!-- 🐾 寶寶小助手區塊 (點擊可切換對話與頭像圖) -->
             <div class="bobo-widget" onclick="triggerBoboSpeech(true)">
-                <div class="bobo-avatar">🐱</div>
+                <img id="bobo-avatar" class="bobo-avatar-img" src="bobo-happy.png" alt="寶寶" onerror="this.src='bobo-happy.jpg'">
                 <div class="bobo-dialog" id="bobo-speech-text">寶寶正在幫你監看交通中...</div>
             </div>
 
@@ -347,28 +350,50 @@
     <script>
         const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
 
-        // 🐱 寶寶對話庫
+        // 🐾 6 張寶寶圖片清單與對應的對話庫
+        const boboImages = [
+            'bobo_love',
+            'bobo_playful',
+            'bobo_shy',
+            'bobo_happy',
+            'bobo_curious',
+            'bobo_cozy'
+        ];
+
+        // 嘗試常見圖片副檔名 (png/jpg/jpeg)
+        function setBoboImageSrc(imgElement, baseName) {
+            imgElement.src = `${baseName}.png`;
+            imgElement.onerror = function() {
+                this.onerror = function() {
+                    this.src = `${baseName}.jpeg`;
+                };
+                this.src = `${baseName}.jpg`;
+            };
+        }
+
         const boboQuotes = {
             morning: [
-                "喵~ 早晨呀！記得飲水同食早餐！",
-                "今日出門記得睇定車班次呀，喵~",
-                "寶寶醒咗啦，今日都要加油喵！"
+                { text: "早晨呀！記得飲水同食早餐！", img: "bobo_happy" },
+                { text: "今日出門記得睇定車班次呀~", img: "bobo_curious" },
+                { text: "寶寶醒咗啦，今日都要加油！", img: "bobo_playful" }
             ],
             afternoon: [
-                "下午茶時間到了！有冇罐罐份？",
-                "坐得太久要伸個懶腰喵~",
-                "寶寶喺度同你一齊睇住 Dashboard！"
+                { text: "下午茶時間到了！有冇罐罐份？", img: "bobo_love" },
+                { text: "坐得太久要伸個懶腰喵~", img: "bobo_cozy" },
+                { text: "寶寶喺度同你一齊睇住 Dashboard！", img: "bobo_curious" }
             ],
             night: [
-                "今晚早啲休息，唔好太遲睡喵 zZZ",
-                "聽日又係新嘅一日，今晚食咩好？",
-                "喵~ 今日辛苦啦！"
+                { text: "今晚早啲休息，唔好太遲睡~", img: "bobo_cozy" },
+                { text: "聽日又係新嘅一日，今晚食咩好？", img: "bobo_shy" },
+                { text: "今日辛苦啦，伸個懶腰睡覺~", img: "bobo_happy" }
             ],
             interactive: [
-                "按我有罐罐食嗎？喵！",
-                "寶寶監測中：一切運作正常！",
-                "喵！好萌好萌~",
-                "你有沒有記得更新備忘錄呀？"
+                { text: "按我有罐罐食嗎？喵！", img: "bobo_love" },
+                { text: "寶寶監測中：一切運作正常！", img: "bobo_curious" },
+                { text: "害羞~ 不要一直點我啦！", img: "bobo_shy" },
+                { text: "你有沒有記得更新備忘錄呀？", img: "bobo_playful" },
+                { text: "最喜歡陪住你啦！", img: "bobo_happy" },
+                { text: "好舒服，想睡個小覺~", img: "bobo_cozy" }
             ]
         };
 
@@ -384,11 +409,12 @@
                 else pool = boboQuotes.night;
             }
 
-            const randomText = pool[Math.floor(Math.random() * pool.length)];
+            const item = pool[Math.floor(Math.random() * pool.length)];
             const textEl = document.getElementById('bobo-speech-text');
-            if (textEl) {
-                textEl.textContent = randomText;
-            }
+            const imgEl = document.getElementById('bobo-avatar');
+
+            if (textEl) textEl.textContent = item.text;
+            if (imgEl && item.img) setBoboImageSrc(imgEl, item.img);
         }
 
         function toggleTheme() {
@@ -801,7 +827,7 @@
             loadMemosFromCloud(); 
             fetchMTR();
             fetchBusETA();
-            triggerBoboSpeech(); // 初始化寶寶對話
+            triggerBoboSpeech(); // 初始化寶寶對話與頭像
         };
 
         setInterval(updateTime, 1000);
@@ -809,7 +835,7 @@
         setInterval(fetchMTR, 15000);
         setInterval(fetchBusETA, 20000);
         setInterval(loadMemosFromCloud, 60000);
-        setInterval(() => triggerBoboSpeech(), 600000); // 每 10 分鐘隨機更換對話
+        setInterval(() => triggerBoboSpeech(), 600000); // 每 10 分鐘自動隨機更換對話與表情圖
     </script>
 </body>
 </html>
