@@ -100,12 +100,22 @@
         .bobo-widget:active {
             transform: scale(0.98);
         }
-        .bobo-avatar-img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            border-radius: 8px;
+        .bobo-avatar-container {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
             flex-shrink: 0;
+            border: 1px solid var(--border-color);
+        }
+        .bobo-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .bobo-dialog {
             flex: 1;
@@ -280,9 +290,11 @@
 
         <!-- 右上：寶寶圖片對話助手 + 天氣資訊與假期倒數 -->
         <div class="panel">
-            <!-- 🐾 寶寶小助手區塊 (點擊可切換對話與頭像圖) -->
+            <!-- 🐾 寶寶小助手區塊 -->
             <div class="bobo-widget" onclick="triggerBoboSpeech(true)">
-                <img id="bobo-avatar" class="bobo-avatar-img" src="bobo-happy.png" alt="寶寶" onerror="this.src='bobo-happy.jpg'">
+                <div class="bobo-avatar-container">
+                    <img id="bobo-avatar" class="bobo-avatar-img" src="" alt="寶寶">
+                </div>
                 <div class="bobo-dialog" id="bobo-speech-text">寶寶正在幫你監看交通中...</div>
             </div>
 
@@ -350,25 +362,24 @@
     <script>
         const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
 
-        // 🐾 6 張寶寶圖片清單與對應的對話庫
-        const boboImages = [
-            'bobo_love',
-            'bobo_playful',
-            'bobo_shy',
-            'bobo_happy',
-            'bobo_curious',
-            'bobo_cozy'
-        ];
+        // 🛠️ 智能圖片載入修復器 (依次嘗試 png -> jpg -> jpeg -> webp)
+        function loadSmartImage(imgElement, baseName) {
+            const extensions = ['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG'];
+            let extIndex = 0;
 
-        // 嘗試常見圖片副檔名 (png/jpg/jpeg)
-        function setBoboImageSrc(imgElement, baseName) {
-            imgElement.src = `${baseName}.png`;
-            imgElement.onerror = function() {
-                this.onerror = function() {
-                    this.src = `${baseName}.jpeg`;
-                };
-                this.src = `${baseName}.jpg`;
-            };
+            function tryNext() {
+                if (extIndex < extensions.length) {
+                    const currentExt = extensions[extIndex++];
+                    imgElement.src = baseName + currentExt;
+                } else {
+                    // 如果全部格式都找不到，顯示備用圖示 🐱
+                    imgElement.onerror = null;
+                    imgElement.parentNode.innerHTML = '<span style="font-size: 2.2rem; line-height: 1;">🐱</span>';
+                }
+            }
+
+            imgElement.onerror = tryNext;
+            tryNext();
         }
 
         const boboQuotes = {
@@ -414,7 +425,7 @@
             const imgEl = document.getElementById('bobo-avatar');
 
             if (textEl) textEl.textContent = item.text;
-            if (imgEl && item.img) setBoboImageSrc(imgEl, item.img);
+            if (imgEl && item.img) loadSmartImage(imgEl, item.img);
         }
 
         function toggleTheme() {
@@ -827,7 +838,7 @@
             loadMemosFromCloud(); 
             fetchMTR();
             fetchBusETA();
-            triggerBoboSpeech(); // 初始化寶寶對話與頭像
+            triggerBoboSpeech();
         };
 
         setInterval(updateTime, 1000);
@@ -835,7 +846,7 @@
         setInterval(fetchMTR, 15000);
         setInterval(fetchBusETA, 20000);
         setInterval(loadMemosFromCloud, 60000);
-        setInterval(() => triggerBoboSpeech(), 600000); // 每 10 分鐘自動隨機更換對話與表情圖
+        setInterval(() => triggerBoboSpeech(), 600000);
     </script>
 </body>
 </html>
