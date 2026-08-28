@@ -16,21 +16,28 @@
             --accent-orange: #f59e0b;
             --accent-red: #f87171;
             --accent-pink: #f472b6;
+            --sub-text: #9ca3af;
+            --box-bg: rgba(0, 0, 0, 0.35);
+            --border-color: rgba(52, 211, 153, 0.2);
         }
 
+        /* Light Mode 色彩對比深度修正 */
         body.light-mode {
-            --bg-color: #f0f2f5;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --text-main: #1f2937;
-            --accent-blue: #2563eb;
-            --accent-green: #059669;
-            --accent-yellow: #d97706;
-            --accent-purple: #7c3aed;
-            --accent-orange: #d97706;
-            --accent-red: #dc2626;
-            --accent-pink: #db2777;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --accent-blue: #1d4ed8;
+            --accent-green: #047857;
+            --accent-yellow: #b45309; /* 由亮黃改為深琥珀色，確保白底清晰 */
+            --accent-purple: #6b21a8;
+            --accent-orange: #c2410c;
+            --accent-red: #b91c1c;
+            --accent-pink: #be185d;
+            --sub-text: #64748b;
+            --box-bg: #f8fafc;
+            --border-color: #cbd5e1;
         }
-        
+
         body { 
             background-color: var(--bg-color); 
             color: var(--text-main); 
@@ -38,7 +45,7 @@
             padding: 10px; 
             margin: 0; 
             font-size: 1.1rem; 
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -54,10 +61,10 @@
             background: var(--card-bg); 
             padding: 14px 18px; 
             border-radius: 14px; 
-            border: 1px solid rgba(52, 211, 153, 0.2); 
+            border: 1px solid var(--border-color); 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -66,33 +73,40 @@
         .panel-top-left { justify-content: center; }
 
         .theme-toggle-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
             color: var(--text-main);
             padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 1.1rem;
-            transition: background 0.2s;
         }
-        .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.15); }
 
-        .clock { font-size: 3.4rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; text-shadow: 0 0 16px rgba(251,191,36,0.3); }
+        .clock { 
+            font-size: 3.4rem; 
+            font-weight: 800; 
+            color: var(--accent-yellow); 
+            line-height: 1; 
+        }
+        body:not(.light-mode) .clock {
+            text-shadow: 0 0 16px rgba(251,191,36,0.3);
+        }
+
         .ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
         .wx-box { display: flex; align-items: center; justify-content: space-between; }
         .wx-temp { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
 
         @keyframes warningBlink {
-            0% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
-            50% { opacity: 0.5; transform: scale(0.98); box-shadow: 0 0 2px rgba(248, 113, 113, 0.1); }
-            100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(248, 113, 113, 0.4); }
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
         }
         .warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
         .warning-badge {
-            background: rgba(248, 113, 113, 0.2);
+            background: rgba(248, 113, 113, 0.15);
             color: var(--accent-red);
-            border: 1px solid rgba(248, 113, 113, 0.5);
+            border: 1px solid var(--accent-red);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 1.1rem;
@@ -102,33 +116,60 @@
             gap: 6px;
             animation: warningBlink 1.5s infinite ease-in-out;
         }
-        .badge-rain-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border-color: #fbbf24; }
-        .badge-rain-red { background: rgba(239, 68, 68, 0.3); color: #ef4444; border-color: #ef4444; }
-        .badge-rain-black { background: rgba(0, 0, 0, 0.6); color: #ffffff; border-color: #ffffff; }
-        .badge-typhoon { background: rgba(147, 51, 234, 0.3); color: #c084fc; border-color: #c084fc; }
+        .badge-rain-yellow { background: rgba(251, 191, 36, 0.2); color: var(--accent-yellow); border-color: var(--accent-yellow); }
+        .badge-rain-red { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border-color: var(--accent-red); }
+        .badge-rain-black { background: rgba(0, 0, 0, 0.8); color: #ffffff; border-color: #ffffff; }
+        .badge-typhoon { background: rgba(147, 51, 234, 0.2); color: var(--accent-purple); border-color: var(--accent-purple); }
 
         /* 備忘錄 */
         .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .memo-input { flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); padding: 12px 16px; border-radius: 10px; color: var(--text-main); font-size: 1.4rem; outline: none; }
-        .memo-input:focus { border-color: var(--accent-green); box-shadow: 0 0 8px rgba(52,211,153,0.2); }
-        .memo-btn { background: var(--accent-green); color: #0b0f19; border: none; padding: 0 22px; border-radius: 10px; font-weight: bold; font-size: 1.3rem; cursor: pointer; }
-        
+        .memo-input { 
+            flex: 1; 
+            background: var(--box-bg); 
+            border: 1px solid var(--border-color); 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            color: var(--text-main); 
+            font-size: 1.4rem; 
+            outline: none; 
+        }
+        .memo-btn { 
+            background: var(--accent-green); 
+            color: #ffffff; 
+            border: none; 
+            padding: 0 22px; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            cursor: pointer; 
+        }
+
         .memo-list { display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-        .memo-item { background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.4rem; font-weight: 600; gap: 10px; border: 1px solid rgba(255,255,255,0.06); }
+        .memo-item { 
+            background: var(--box-bg); 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 1.4rem; 
+            font-weight: 600; 
+            gap: 10px; 
+            border: 1px solid var(--border-color); 
+        }
 
         .memo-actions { display: flex; gap: 8px; }
-        .memo-action-btn { background: rgba(255,255,255,0.1); color: var(--text-main); border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 1.1rem; }
+        .memo-action-btn { background: rgba(0,0,0,0.06); color: var(--text-main); border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 1.1rem; }
         .memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.4rem; padding: 0 6px; }
-        
-        .refresh-memo-btn { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
-        .refresh-memo-btn:active { background: rgba(255, 255, 255, 0.25); }
+
+        .refresh-memo-btn { background: var(--box-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; font-size: 1.05rem; cursor: pointer; }
 
         .transit-container { display: flex; flex-direction: column; gap: 10px; }
 
         .mtr-grid-4x1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .mtr-card-4x1 {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(251, 191, 36, 0.25);
+        .mtr-card-4x1, .bus-card-box {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px 4px;
             display: flex;
@@ -140,27 +181,24 @@
         }
 
         .bus-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .bus-card-box {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(251, 191, 36, 0.25);
-            border-radius: 10px;
-            padding: 10px 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            text-align: center;
-            min-height: 100px;
+
+        .route-badge { 
+            font-size: 1.35rem; 
+            font-weight: 900; 
+            color: var(--accent-yellow); 
+            background: rgba(180, 83, 9, 0.1); 
+            padding: 4px 12px; 
+            border-radius: 8px; 
+            border: 1px solid var(--accent-yellow); 
         }
 
-        .route-badge { font-size: 1.35rem; font-weight: 900; color: var(--accent-yellow); background: rgba(251, 191, 36, 0.2); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.4); }
         .transit-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-        .transit-input { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); padding: 10px; border-radius: 8px; color: var(--text-main); font-size: 1.15rem; outline: none; }
-        .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.15rem; cursor: pointer; white-space: nowrap; }
+        .transit-input { background: var(--box-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-main); font-size: 1.15rem; outline: none; }
+        .transit-add-btn { background: var(--accent-blue); color: #ffffff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.15rem; cursor: pointer; white-space: nowrap; }
 
-        .status-pill { font-size: 0.95rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .pill-active-special { background: rgba(244, 114, 182, 0.25); color: var(--accent-pink); border-color: rgba(244, 114, 182, 0.6); }
-        .pill-active-normal { background: rgba(52, 211, 153, 0.25); color: var(--accent-green); border-color: rgba(52, 211, 153, 0.5); }
+        .status-pill { font-size: 0.95rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
+        .pill-active-special { background: rgba(190, 24, 93, 0.15); color: var(--accent-pink); border: 1px solid var(--accent-pink); }
+        .pill-active-normal { background: rgba(4, 120, 87, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
 
         @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
@@ -178,7 +216,7 @@
                 <button class="theme-toggle-btn" onclick="toggleTheme()" title="切換 Light / Dark 模式">🌓</button>
             </div>
 
-            <div id="lunar-info" style="font-size: 1.15rem; color: var(--accent-purple); font-weight: bold; text-align: center; background: rgba(192,132,252,0.1); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(192,132,252,0.2);">
+            <div id="lunar-info" style="font-size: 1.15rem; color: var(--accent-purple); font-weight: bold; text-align: center; background: var(--box-bg); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-color);">
                 載入農曆中...
             </div>
             
@@ -201,12 +239,12 @@
                         </div>
                         <div style="font-size: 1.4rem; font-weight: bold; margin-top: 6px; display: flex; gap: 12px; align-items: center;">
                             <span style="color: var(--accent-blue);">濕度: <span id="current-humidity">--%</span></span>
-                            <span style="color: rgba(255,255,255,0.3);">|</span>
+                            <span style="color: var(--sub-text);">|</span>
                             <span style="color: var(--accent-green);">降雨: <span id="wx-rain">--</span></span>
                         </div>
                     </div>
                 </div>
-                <div style="text-align: right; font-size: 1.25rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="text-align: right; font-size: 1.25rem; font-weight: bold; background: var(--box-bg); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color);">
                     <div style="color: var(--accent-orange);">最高: <span id="wx-max">--°C</span></div>
                     <div style="color: var(--accent-blue); margin-top: 4px;">最低: <span id="wx-min">--°C</span></div>
                 </div>
@@ -214,18 +252,18 @@
             
             <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
             
-            <div id="holiday-countdown" style="margin-top: auto; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
-                <span style="font-size: 1.05rem; color: #9ca3af;">計算假期中...</span>
+            <div id="holiday-countdown" style="margin-top: auto; background: var(--box-bg); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <span style="font-size: 1.05rem; color: var(--sub-text);">計算假期中...</span>
             </div>
         </div>
 
         <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
-                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
+                <div style="color: var(--sub-text); text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
             </div>
 
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 6px;">
+            <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 6px;">
                 <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
                     <button class="refresh-memo-btn" onclick="loadMemosFromCloud()">🔄 手動同步雲端</button>
                 </div>
@@ -234,7 +272,7 @@
                     <button class="memo-btn" onclick="addMemo()">新增</button>
                 </div>
                 <div class="memo-list" id="memo-list">
-                    <div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">正在讀取備忘...</div>
+                    <div style="color: var(--sub-text); text-align: center; padding: 6px; font-size: 1.2rem;">正在讀取備忘...</div>
                 </div>
             </div>
         </div>
@@ -248,7 +286,7 @@
                 <button class="transit-add-btn" onclick="addBusRoute()">新增</button>
             </div>
             <div class="transit-container" id="bus-eta-list" style="max-height: 360px; overflow-y: auto;">
-                <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入巴士資料中...</div>
+                <div style="color: var(--sub-text); text-align: center; padding: 10px; font-size: 1.1rem;">載入巴士資料中...</div>
             </div>
         </div>
     </div>
@@ -305,21 +343,12 @@
             } catch (e) {}
         }
 
-        // 動態取得/計算假期
+        // 動態假期倒數計算
         async function updateHolidayCountdown() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            let holidays = [];
-
-            try {
-                // 嘗試從政府 API 開放資料獲取最新的假期 JSON
-                const res = await fetch("https://www.gld.gov.hk/egazette/english/gazette/search_gazette.php"); 
-                // 備用動態假期清單（自動覆蓋當前年及次年）
-                holidays = getFallbackHolidays(today.getFullYear());
-            } catch (e) {
-                holidays = getFallbackHolidays(today.getFullYear());
-            }
+            const holidays = getFallbackHolidays();
 
             const upcoming = holidays.map(h => {
                 const hDate = new Date(h.date);
@@ -334,15 +363,14 @@
                 let timeText = next.diffDays === 0 ? '就是今天！' : `${next.diffDays} 日後`;
                 el.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 1.1rem; color: #9ca3af;">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
+                        <span style="font-size: 1.1rem; color: var(--sub-text);">最近假期: <span style="color: var(--accent-blue); font-weight: bold;">${next.name}</span></span>
                         <span style="font-size: 1.25rem; font-weight: 800; color: var(--accent-yellow);">${timeText}</span>
                     </div>
                 `;
             }
         }
 
-        // 包含 2026-2027 年精確公眾假期
-        function getFallbackHolidays(year) {
+        function getFallbackHolidays() {
             return [
                 { name: "中秋節翌日", date: "2026-09-26" },
                 { name: "國慶日", date: "2026-10-01" },
@@ -426,7 +454,7 @@
                                 if (code === 'TC1' || nameText.includes('一號')) nameText = '1號戒備訊號';
                                 else if (code === 'TC3' || nameText.includes('三號')) nameText = '3號強風訊號';
                                 else if (code.includes('TC8') || nameText.includes('八號')) nameText = '8號烈風/暴風訊號';
-                                else if (code === 'TC9' || nameText.includes('九號')) nameText = '9號烈风/暴風增強訊號';
+                                else if (code === 'TC9' || nameText.includes('九號')) nameText = '9號烈風/暴風增強訊號';
                                 else if (code === 'TC10' || nameText.includes('十號')) nameText = '10號颶風訊號';
                             }
 
@@ -448,7 +476,7 @@
                 if (json.status === 1 && json.data) {
                     const stationData = json.data['TML-HEO'];
                     if (!stationData) {
-                        container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px;">暫無列車資料</div>';
+                        container.innerHTML = '<div style="color: var(--sub-text); text-align: center; padding: 10px;">暫無列車資料</div>';
                         return;
                     }
 
@@ -475,8 +503,8 @@
         function renderMtrCard4x1(t, destMap) {
             if (!t) {
                 return `
-                    <div class="mtr-card-4x1" style="opacity: 0.3; justify-content: center;">
-                        <span style="font-size: 0.95rem; color: #9ca3af;">暫無班次</span>
+                    <div class="mtr-card-4x1" style="opacity: 0.35; justify-content: center;">
+                        <span style="font-size: 0.95rem; color: var(--sub-text);">暫無班次</span>
                     </div>
                 `;
             }
@@ -513,7 +541,7 @@
             const container = document.getElementById('bus-eta-list');
             const routes = getStoredBusRoutes();
             if (routes.length === 0) {
-                container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">請新增巴士路線</div>';
+                container.innerHTML = '<div style="color: var(--sub-text); text-align: center; padding: 10px; font-size: 1.1rem;">請新增巴士路線</div>';
                 return;
             }
 
@@ -557,7 +585,7 @@
 
                             const rmkText = e.rmk_tc ? e.rmk_tc.trim() : '';
                             
-                            // 強化特別車邏輯判斷
+                            // 特別車精準判斷邏輯
                             const specialKeywords = ['特別', '特快', '繞經', '不經', '由', '加開', '短途', '特別班次', '開出'];
                             const isRoutineText = (rmkText === '預定班次' || rmkText === '常規班次' || rmkText === '預定班次(常規)' || rmkText === '原定班次');
 
@@ -573,20 +601,20 @@
                                     <div style="font-size: 2.1rem; color: var(--accent-green); font-weight: 900;">${timeStr}</div>
                                     <div style="font-size: 1.3rem; color: var(--accent-yellow); font-weight: bold; margin: 2px 0;">${clockTime}</div>
                                     <span class="status-pill ${isSpecial ? 'pill-active-special' : 'pill-active-normal'}">${isSpecial ? '特別' : '普通'}</span>
-                                    ${showRemark ? `<div style="font-size: 0.75rem; color: #9ca3af; margin-top: 2px; line-height: 1.1; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${rmkText}">${rmkText}</div>` : ''}
+                                    ${showRemark ? `<div style="font-size: 0.75rem; color: var(--sub-text); margin-top: 2px; line-height: 1.1; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${rmkText}">${rmkText}</div>` : ''}
                                 </div>
                             `;
                         } else {
                             boxesHtml += `
                                 <div class="bus-card-box" style="opacity: 0.35; justify-content: center;">
-                                    <span style="font-size: 0.95rem; color: #9ca3af;">無班次</span>
+                                    <span style="font-size: 0.95rem; color: var(--sub-text);">無班次</span>
                                 </div>
                             `;
                         }
                     }
 
                     htmlContent += `
-                        <div style="background: rgba(0,0,0,0.2); padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="background: var(--box-bg); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color);">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <span class="route-badge">${r.route}</span>
@@ -655,7 +683,7 @@
         function renderMemos(memos) {
             const listEl = document.getElementById('memo-list');
             if (!memos || memos.length === 0) {
-                listEl.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 6px; font-size: 1.2rem;">目前沒有備忘</div>';
+                listEl.innerHTML = '<div style="color: var(--sub-text); text-align: center; padding: 6px; font-size: 1.2rem;">目前沒有備忘</div>';
                 return;
             }
             listEl.innerHTML = memos.map((text, index) => `
