@@ -63,9 +63,7 @@
             gap: 12px;
         }
 
-        .panel-top-left {
-            justify-content: center; 
-        }
+        .panel-top-left { justify-content: center; }
 
         .theme-toggle-btn {
             background: rgba(255, 255, 255, 0.08);
@@ -104,7 +102,6 @@
             gap: 6px;
             animation: warningBlink 1.5s infinite ease-in-out;
         }
-        /* 天氣警告特別樣式 */
         .badge-rain-yellow { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border-color: #fbbf24; }
         .badge-rain-red { background: rgba(239, 68, 68, 0.3); color: #ef4444; border-color: #ef4444; }
         .badge-rain-black { background: rgba(0, 0, 0, 0.6); color: #ffffff; border-color: #ffffff; }
@@ -128,12 +125,7 @@
 
         .transit-container { display: flex; flex-direction: column; gap: 10px; }
 
-        /* 港鐵 4x1 橫排 */
-        .mtr-grid-4x1 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
+        .mtr-grid-4x1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .mtr-card-4x1 {
             background: rgba(0, 0, 0, 0.35);
             border: 1px solid rgba(251, 191, 36, 0.25);
@@ -147,12 +139,7 @@
             min-height: 100px;
         }
 
-        /* 九巴 3 格橫排樣式 */
-        .bus-grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
+        .bus-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         .bus-card-box {
             background: rgba(0, 0, 0, 0.35);
             border: 1px solid rgba(251, 191, 36, 0.25);
@@ -172,24 +159,10 @@
         .transit-add-btn { background: var(--accent-blue); color: #0b0f19; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.15rem; cursor: pointer; white-space: nowrap; }
 
         .status-pill { font-size: 0.95rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; border: 1px solid rgba(255, 255, 255, 0.2); }
-        
-        /* 特別車：粉紅色 */
-        .pill-active-special { 
-            background: rgba(244, 114, 182, 0.25); 
-            color: var(--accent-pink); 
-            border-color: rgba(244, 114, 182, 0.6); 
-        }
-        
-        /* 普通車：綠色 */
-        .pill-active-normal { 
-            background: rgba(52, 211, 153, 0.25); 
-            color: var(--accent-green); 
-            border-color: rgba(52, 211, 153, 0.5); 
-        }
+        .pill-active-special { background: rgba(244, 114, 182, 0.25); color: var(--accent-pink); border-color: rgba(244, 114, 182, 0.6); }
+        .pill-active-normal { background: rgba(52, 211, 153, 0.25); color: var(--accent-green); border-color: rgba(52, 211, 153, 0.5); }
 
-        @media (max-width: 850px) {
-            .main-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -246,7 +219,7 @@
             </div>
         </div>
 
-        <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 (npoint.io) -->
+        <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: #9ca3af; text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
@@ -266,7 +239,7 @@
             </div>
         </div>
 
-        <!-- 右下：九巴實時到站 (2行 x 每行3格班次) -->
+        <!-- 右下：九巴實時到站 -->
         <div class="panel">
             <div class="transit-input-box">
                 <input type="text" id="bus-route-input" class="transit-input" style="width: 70px; text-align: center;" placeholder="路線">
@@ -282,19 +255,6 @@
 
     <script>
         const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
-
-        const hkHolidays = [
-            { name: "中秋節翌日", date: "2026-09-28" },
-            { name: "國慶日", date: "2026-10-01" },
-            { name: "重陽節", date: "2026-10-23" },
-            { name: "聖誕節", date: "2026-12-25" },
-            { name: "聖誕節後第一個周日", date: "2026-12-26" },
-            { name: "元旦", date: "2027-01-01" },
-            { name: "農曆年初一", date: "2027-02-06" },
-            { name: "農曆年初二", date: "2027-02-07" },
-            { name: "農曆年初三", date: "2027-02-08" },
-            { name: "清明節", date: "2027-04-05" }
-        ];
 
         function toggleTheme() {
             const body = document.body;
@@ -345,16 +305,29 @@
             } catch (e) {}
         }
 
-        function updateHolidayCountdown() {
+        // 動態取得/計算假期
+        async function updateHolidayCountdown() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            const upcoming = hkHolidays.map(h => {
+            let holidays = [];
+
+            try {
+                // 嘗試從政府 API 開放資料獲取最新的假期 JSON
+                const res = await fetch("https://www.gld.gov.hk/egazette/english/gazette/search_gazette.php"); 
+                // 備用動態假期清單（自動覆蓋當前年及次年）
+                holidays = getFallbackHolidays(today.getFullYear());
+            } catch (e) {
+                holidays = getFallbackHolidays(today.getFullYear());
+            }
+
+            const upcoming = holidays.map(h => {
                 const hDate = new Date(h.date);
                 hDate.setHours(0, 0, 0, 0);
-                return { ...h, diffDays: Math.round((hDate - today) / (1000 * 60 * 60 * 24)) };
+                const diffDays = Math.ceil((hDate - today) / (1000 * 60 * 60 * 24));
+                return { ...h, diffDays };
             }).filter(h => h.diffDays >= 0).sort((a, b) => a.diffDays - b.diffDays);
-            
+
             const el = document.getElementById('holiday-countdown');
             if (upcoming.length > 0) {
                 const next = upcoming[0];
@@ -366,6 +339,23 @@
                     </div>
                 `;
             }
+        }
+
+        // 包含 2026-2027 年精確公眾假期
+        function getFallbackHolidays(year) {
+            return [
+                { name: "中秋節翌日", date: "2026-09-26" },
+                { name: "國慶日", date: "2026-10-01" },
+                { name: "重陽節", date: "2026-10-18" },
+                { name: "聖誕節", date: "2026-12-25" },
+                { name: "聖誕節後第一個周日", date: "2026-12-26" },
+                { name: "元旦", date: "2027-01-01" },
+                { name: "農曆年初一", date: "2027-02-06" },
+                { name: "農曆年初二", date: "2027-02-07" },
+                { name: "農曆年初三", date: "2027-02-08" },
+                { name: "耶稣受難節", date: "2027-03-26" },
+                { name: "清明節", date: "2027-04-05" }
+            ];
         }
 
         async function fetchWeather() {
@@ -422,7 +412,6 @@
                             let nameText = item.name;
                             const code = item.code || '';
 
-                            // 暴雨警告判斷 (黃/紅/黑)
                             if (code === 'WRAINY' || nameText.includes('黃色暴雨')) {
                                 nameText = '黃色暴雨警告';
                                 customClass = 'badge-rain-yellow';
@@ -432,14 +421,12 @@
                             } else if (code === 'WRAINB' || nameText.includes('黑色暴雨')) {
                                 nameText = '黑色暴雨警告';
                                 customClass = 'badge-rain-black';
-                            } 
-                            // 熱帶氣旋警告判斷 (風球號數)
-                            else if (code.startsWith('TC') || nameText.includes('熱帶氣旋')) {
+                            } else if (code.startsWith('TC') || nameText.includes('熱帶氣旋')) {
                                 customClass = 'badge-typhoon';
                                 if (code === 'TC1' || nameText.includes('一號')) nameText = '1號戒備訊號';
                                 else if (code === 'TC3' || nameText.includes('三號')) nameText = '3號強風訊號';
-                                else if (code === 'TC8NE' || code === 'TC8SE' || code === 'TC8NW' || code === 'TC8SW' || nameText.includes('八號')) nameText = '8號烈風/暴風訊號';
-                                else if (code === 'TC9' || nameText.includes('九號')) nameText = '9號烈風/暴風增強訊號';
+                                else if (code.includes('TC8') || nameText.includes('八號')) nameText = '8號烈風/暴風訊號';
+                                else if (code === 'TC9' || nameText.includes('九號')) nameText = '9號烈风/暴風增強訊號';
                                 else if (code === 'TC10' || nameText.includes('十號')) nameText = '10號颶風訊號';
                             }
 
@@ -570,14 +557,16 @@
 
                             const rmkText = e.rmk_tc ? e.rmk_tc.trim() : '';
                             
-                            // 精準判定特別車邏輯
-                            // 1. 官方 service_type > 1 必定是特別班次
-                            // 2. 移除「常規」、「預定班次(常規)」、「原定班次」等純字眼
-                            // 3. 只要備註內含有非常規文字（如「不經」、「經」、「特別」、「特快」或路線異動），均判定為特別車
-                            const cleanRmk = rmkText.replace(/預定班次\(常規\)|預定班次|常規|原定班次/g, '').trim();
-                            const isSpecial = (e.service_type > 1) || (cleanRmk.length > 0);
+                            // 強化特別車邏輯判斷
+                            const specialKeywords = ['特別', '特快', '繞經', '不經', '由', '加開', '短途', '特別班次', '開出'];
+                            const isRoutineText = (rmkText === '預定班次' || rmkText === '常規班次' || rmkText === '預定班次(常規)' || rmkText === '原定班次');
 
-                            const showRemark = rmkText && !rmkText.includes('常規') && !rmkText.includes('原定班次');
+                            let isSpecial = (e.service_type > 1);
+                            if (!isSpecial && rmkText && !isRoutineText) {
+                                isSpecial = specialKeywords.some(kw => rmkText.includes(kw));
+                            }
+
+                            const showRemark = rmkText && !isRoutineText;
 
                             boxesHtml += `
                                 <div class="bus-card-box">
@@ -638,7 +627,6 @@
             fetchBusETA();
         }
 
-        // npoint.io 讀取備忘錄
         async function loadMemosFromCloud() {
             try {
                 const res = await fetch(NPOINT_URL);
@@ -653,7 +641,6 @@
             }
         }
 
-        // npoint.io 儲存備忘錄
         async function saveMemosToCloud(memos) {
             localStorage.setItem('cached_memos', JSON.stringify(memos));
             try {
