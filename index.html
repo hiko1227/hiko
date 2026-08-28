@@ -5,216 +5,249 @@
     <title>3008 Tablet Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.6.12/lunar.min.js"></script>
     <style>
-      :root { 
-    --bg-color: #0b0f19; 
-    --card-bg: rgba(255, 255, 255, 0.045); 
-    --text-main: #f3f4f6; 
-    --accent-blue: #60a5fa;
-    --accent-green: #34d399;
-    --accent-yellow: #fbbf24;
-    --accent-purple: #c084fc;
-    --accent-orange: #f59e0b;
-    --accent-red: #f87171;
-    --accent-pink: #f472b6;
-    --sub-text: #9ca3af;
-    --box-bg: rgba(0, 0, 0, 0.35);
-    --border-color: rgba(52, 211, 153, 0.2);
-    --btn-gray: rgba(255,255,255,0.08);
-}
+        :root { 
+            --bg-color: #0b0f19; 
+            --card-bg: rgba(255, 255, 255, 0.045); 
+            --text-main: #f3f4f6; 
+            --accent-blue: #60a5fa;
+            --accent-green: #34d399;
+            --accent-yellow: #fbbf24;
+            --accent-purple: #c084fc;
+            --accent-orange: #f59e0b;
+            --accent-red: #f87171;
+            --accent-pink: #f472b6;
+            --sub-text: #9ca3af;
+            --box-bg: rgba(0, 0, 0, 0.35);
+            --border-color: rgba(52, 211, 153, 0.2);
+            --btn-gray: rgba(255,255,255,0.08);
+            --bobo-bubble-bg: rgba(96, 165, 250, 0.12);
+        }
 
-/* 🎨 全新調校：乾淨極簡 Light Mode */
-body.light-mode {
-    --bg-color: #f4f6f9;
-    --card-bg: #ffffff;
-    --text-main: #1e293b;         /* 深灰黑，比純黑更高級 */
-    --accent-blue: #2563eb;        /* 質感皇家藍 */
-    --accent-green: #059669;       /* 翡翠綠 */
-    --accent-yellow: #d97706;      /* 暖陽橙黃（不再呈泥土啡色） */
-    --accent-purple: #7c3aed;
-    --accent-orange: #ea580c;
-    --accent-red: #dc2626;
-    --accent-pink: #db2777;
-    --sub-text: #64748b;
-    --box-bg: #f8fafc;
-    --border-color: #e2e8f0;       /* 柔和淺灰邊框 */
-    --btn-gray: #e2e8f0;
-}
+        /* 🎨 Light Mode 調校 */
+        body.light-mode {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --accent-blue: #2563eb;
+            --accent-green: #059669;
+            --accent-yellow: #d97706;
+            --accent-purple: #7c3aed;
+            --accent-orange: #ea580c;
+            --accent-red: #dc2626;
+            --accent-pink: #db2777;
+            --sub-text: #64748b;
+            --box-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --btn-gray: #e2e8f0;
+            --bobo-bubble-bg: #eff6ff;
+        }
 
-body { 
-    background-color: var(--bg-color); 
-    color: var(--text-main); 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-    padding: 12px; 
-    margin: 0; 
-    font-size: 1.1rem; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-    -webkit-font-smoothing: antialiased;
-}
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            padding: 12px; 
+            margin: 0; 
+            font-size: 1.1rem; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
 
-.main-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 12px; 
-    max-width: 1280px; 
-    margin: auto; 
-} 
+        .main-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            max-width: 1280px; 
+            margin: auto; 
+        } 
+        
+        .panel { 
+            background: var(--card-bg); 
+            padding: 16px; 
+            border-radius: 16px; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-.panel { 
-    background: var(--card-bg); 
-    padding: 16px; 
-    border-radius: 16px; 
-    border: 1px solid var(--border-color); 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+        .panel-top-left { justify-content: center; }
 
-.panel-top-left { justify-content: center; }
+        .theme-toggle-btn {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
 
-.theme-toggle-btn {
-    background: var(--box-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1rem;
-}
+        /* 🐾 寶寶助手專區 */
+        .bobo-widget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bobo-bubble-bg);
+            border: 1px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+        .bobo-widget:active {
+            transform: scale(0.98);
+        }
+        .bobo-avatar {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .bobo-dialog {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
 
-/* 時鐘與數字：Light Mode 採用高清深藍/藍黑，不再用刺眼黃/啡色 */
-.clock { 
-    font-size: 3.4rem; 
-    font-weight: 800; 
-    color: var(--accent-yellow); 
-    line-height: 1; 
-}
-body.light-mode .clock,
-body.light-mode .wx-temp {
-    color: #0f172a; /* 淺色模式下時鐘與溫度改用深藍黑色，醒目又現代 */
-}
+        .clock { 
+            font-size: 3.4rem; 
+            font-weight: 800; 
+            color: var(--accent-yellow); 
+            line-height: 1; 
+        }
+        body.light-mode .clock,
+        body.light-mode .wx-temp {
+            color: #0f172a;
+        }
 
-body:not(.light-mode) .clock {
-    text-shadow: 0 0 16px rgba(251,191,36,0.3);
-}
+        body:not(.light-mode) .clock {
+            text-shadow: 0 0 16px rgba(251,191,36,0.3);
+        }
 
-.ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
+        .ampm { font-size: 1.2rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; }
 
-.wx-box { display: flex; align-items: center; justify-content: space-between; }
-.wx-temp { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
+        .wx-box { display: flex; align-items: center; justify-content: space-between; }
+        .wx-temp { font-size: 2.8rem; font-weight: 800; color: var(--accent-yellow); line-height: 1; }
 
-.warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.warning-badge {
-    background: rgba(248, 113, 113, 0.15);
-    color: var(--accent-red);
-    border: 1px solid var(--accent-red);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
+        @keyframes warningBlink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .warning-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .warning-badge {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            animation: warningBlink 1.5s infinite ease-in-out;
+        }
 
-/* 備忘錄樣式修飾 */
-.memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
-.memo-input { 
-    flex: 1; 
-    background: var(--box-bg); 
-    border: 1px solid var(--border-color); 
-    padding: 10px 14px; 
-    border-radius: 10px; 
-    color: var(--text-main); 
-    font-size: 1.2rem; 
-    outline: none; 
-}
-.memo-btn { 
-    background: var(--accent-blue); /* 統一主要按鈕為藍色 */
-    color: #ffffff; 
-    border: none; 
-    padding: 0 20px; 
-    border-radius: 10px; 
-    font-weight: bold; 
-    font-size: 1.15rem; 
-    cursor: pointer; 
-}
+        /* 備忘錄 */
+        .memo-input-box { display: flex; gap: 8px; margin-bottom: 8px; }
+        .memo-input { 
+            flex: 1; 
+            background: var(--box-bg); 
+            border: 1px solid var(--border-color); 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            color: var(--text-main); 
+            font-size: 1.2rem; 
+            outline: none; 
+        }
+        .memo-btn { 
+            background: var(--accent-blue); 
+            color: #ffffff; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            font-size: 1.15rem; 
+            cursor: pointer; 
+        }
 
-.memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
-.memo-item { 
-    background: var(--box-bg); 
-    padding: 10px 14px; 
-    border-radius: 10px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    font-size: 1.25rem; 
-    font-weight: 600; 
-    gap: 10px; 
-    border: 1px solid var(--border-color); 
-}
+        .memo-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+        .memo-item { 
+            background: var(--box-bg); 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            gap: 10px; 
+            border: 1px solid var(--border-color); 
+        }
 
-.memo-actions { display: flex; gap: 6px; }
-.memo-action-btn { 
-    background: var(--btn-gray); 
-    color: var(--text-main); 
-    border: none; 
-    padding: 4px 8px; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    font-size: 1rem; 
-}
-.memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.3rem; padding: 0 6px; }
+        .memo-actions { display: flex; gap: 6px; }
+        .memo-action-btn { 
+            background: var(--btn-gray); 
+            color: var(--text-main); 
+            border: none; 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+        }
+        .memo-delete { color: var(--accent-red); background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.3rem; padding: 0 6px; }
 
-.refresh-memo-btn { background: var(--box-bg); color: var(--sub-text); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+        .refresh-memo-btn { background: var(--box-bg); color: var(--sub-text); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; }
 
-/* 交通卡片 */
-.transit-container { display: flex; flex-direction: column; gap: 10px; }
+        .transit-container { display: flex; flex-direction: column; gap: 10px; }
 
-.mtr-grid-4x1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.mtr-card-4x1, .bus-card-box {
-    background: var(--box-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 8px 4px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    min-height: 95px;
-}
+        .mtr-grid-4x1 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .mtr-card-4x1, .bus-card-box {
+            background: var(--box-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            min-height: 95px;
+        }
 
-.bus-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .bus-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-.route-badge { 
-    font-size: 1.2rem; 
-    font-weight: 900; 
-    color: var(--accent-blue); 
-    background: rgba(37, 99, 235, 0.08); 
-    padding: 3px 10px; 
-    border-radius: 6px; 
-    border: 1px solid var(--accent-blue); 
-}
+        .route-badge { 
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            color: var(--accent-blue); 
+            background: rgba(37, 99, 235, 0.08); 
+            padding: 3px 10px; 
+            border-radius: 6px; 
+            border: 1px solid var(--accent-blue); 
+        }
 
-.transit-input-box { display: flex; gap: 8px; margin-bottom: 4px; }
-.transit-input { background: var(--box-bg); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 8px; color: var(--text-main); font-size: 1.1rem; outline: none; }
-.transit-add-btn { background: var(--accent-blue); color: #ffffff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; white-space: nowrap; }
+        .transit-input-box { display: flex; gap: 8px; margin-bottom: 4px; }
+        .transit-input { background: var(--box-bg); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 8px; color: var(--text-main); font-size: 1.1rem; outline: none; }
+        .transit-add-btn { background: var(--accent-blue); color: #ffffff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; white-space: nowrap; }
 
-.status-pill { font-size: 0.9rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
-.pill-active-special { background: rgba(219, 39, 119, 0.12); color: var(--accent-pink); border: 1px solid var(--accent-pink); }
-.pill-active-normal { background: rgba(5, 150, 105, 0.12); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .status-pill { font-size: 0.9rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
+        .pill-active-special { background: rgba(219, 39, 119, 0.12); color: var(--accent-pink); border: 1px solid var(--accent-pink); }
+        .pill-active-normal { background: rgba(5, 150, 105, 0.12); color: var(--accent-green); border: 1px solid var(--accent-green); }
 
-/* 隱藏滾動條但保持滾動功能，解決右側卡位問題 */
-#bus-eta-list::-webkit-scrollbar, .memo-list::-webkit-scrollbar {
-    width: 4px;
-}
-#bus-eta-list::-webkit-scrollbar-thumb, .memo-list::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
-}
+        #bus-eta-list::-webkit-scrollbar, .memo-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        #bus-eta-list::-webkit-scrollbar-thumb, .memo-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
 
-@media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 850px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -242,8 +275,14 @@ body:not(.light-mode) .clock {
             </div>
         </div>
 
-        <!-- 右上：天氣資訊與假期倒數 -->
+        <!-- 右上：寶寶對話助手 + 天氣資訊與假期倒數 -->
         <div class="panel">
+            <!-- 🐱 寶寶小助手區塊 (點擊可切換對話) -->
+            <div class="bobo-widget" onclick="triggerBoboSpeech(true)">
+                <div class="bobo-avatar">🐱</div>
+                <div class="bobo-dialog" id="bobo-speech-text">寶寶正在幫你監看交通中...</div>
+            </div>
+
             <div class="wx-box">
                 <div style="display: flex; align-items: center; gap: 18px;">
                     <img id="wx-icon-img" src="" alt="天氣圖示" style="width: 64px; height: 64px; display: none;" onerror="this.style.display='none'">
@@ -251,14 +290,14 @@ body:not(.light-mode) .clock {
                         <div style="display: flex; align-items: baseline; gap: 8px;">
                             <span class="wx-temp" id="current-temp">--°C</span>
                         </div>
-                        <div style="font-size: 1.4rem; font-weight: bold; margin-top: 6px; display: flex; gap: 12px; align-items: center;">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-top: 6px; display: flex; gap: 12px; align-items: center;">
                             <span style="color: var(--accent-blue);">濕度: <span id="current-humidity">--%</span></span>
                             <span style="color: var(--sub-text);">|</span>
                             <span style="color: var(--accent-green);">降雨: <span id="wx-rain">--</span></span>
                         </div>
                     </div>
                 </div>
-                <div style="text-align: right; font-size: 1.25rem; font-weight: bold; background: var(--box-bg); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <div style="text-align: right; font-size: 1.2rem; font-weight: bold; background: var(--box-bg); padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border-color);">
                     <div style="color: var(--accent-orange);">最高: <span id="wx-max">--°C</span></div>
                     <div style="color: var(--accent-blue); margin-top: 4px;">最低: <span id="wx-min">--°C</span></div>
                 </div>
@@ -266,12 +305,12 @@ body:not(.light-mode) .clock {
             
             <div id="weather-warning-box" class="warning-container" style="display: none;"></div>
             
-            <div id="holiday-countdown" style="margin-top: auto; background: var(--box-bg); padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-color);">
+            <div id="holiday-countdown" style="margin-top: auto; background: var(--box-bg); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color);">
                 <span style="font-size: 1.05rem; color: var(--sub-text);">計算假期中...</span>
             </div>
         </div>
 
-        <!-- 左下：港鐵恆安站 (4x1 橫排) + 備忘錄 -->
+        <!-- 左下：港鐵恆安站 + 備忘錄 -->
         <div class="panel">
             <div class="transit-container" id="mtr-eta-list">
                 <div style="color: var(--sub-text); text-align: center; padding: 10px; font-size: 1.1rem;">載入港鐵實時資料中...</div>
@@ -307,6 +346,50 @@ body:not(.light-mode) .clock {
 
     <script>
         const NPOINT_URL = "https://api.npoint.io/6c4e46cd350165fe37c2";
+
+        // 🐱 寶寶對話庫
+        const boboQuotes = {
+            morning: [
+                "喵~ 早晨呀！記得飲水同食早餐！",
+                "今日出門記得睇定車班次呀，喵~",
+                "寶寶醒咗啦，今日都要加油喵！"
+            ],
+            afternoon: [
+                "下午茶時間到了！有冇罐罐份？",
+                "坐得太久要伸個懶腰喵~",
+                "寶寶喺度同你一齊睇住 Dashboard！"
+            ],
+            night: [
+                "今晚早啲休息，唔好太遲睡喵 zZZ",
+                "聽日又係新嘅一日，今晚食咩好？",
+                "喵~ 今日辛苦啦！"
+            ],
+            interactive: [
+                "按我有罐罐食嗎？喵！",
+                "寶寶監測中：一切運作正常！",
+                "喵！好萌好萌~",
+                "你有沒有記得更新備忘錄呀？"
+            ]
+        };
+
+        function triggerBoboSpeech(isClick = false) {
+            const hour = new Date().getHours();
+            let pool = [];
+
+            if (isClick) {
+                pool = boboQuotes.interactive;
+            } else {
+                if (hour >= 5 && hour < 12) pool = boboQuotes.morning;
+                else if (hour >= 12 && hour < 18) pool = boboQuotes.afternoon;
+                else pool = boboQuotes.night;
+            }
+
+            const randomText = pool[Math.floor(Math.random() * pool.length)];
+            const textEl = document.getElementById('bobo-speech-text');
+            if (textEl) {
+                textEl.textContent = randomText;
+            }
+        }
 
         function toggleTheme() {
             const body = document.body;
@@ -357,7 +440,6 @@ body:not(.light-mode) .clock {
             } catch (e) {}
         }
 
-        // 動態假期倒數計算
         async function updateHolidayCountdown() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -391,12 +473,7 @@ body:not(.light-mode) .clock {
                 { name: "重陽節", date: "2026-10-18" },
                 { name: "聖誕節", date: "2026-12-25" },
                 { name: "聖誕節後第一個周日", date: "2026-12-26" },
-                { name: "元旦", date: "2027-01-01" },
-                { name: "農曆年初一", date: "2027-02-06" },
-                { name: "農曆年初二", date: "2027-02-07" },
-                { name: "農曆年初三", date: "2027-02-08" },
-                { name: "耶稣受難節", date: "2027-03-26" },
-                { name: "清明節", date: "2027-04-05" }
+                { name: "元旦", date: "2027-01-01" }
             ];
         }
 
@@ -450,29 +527,8 @@ body:not(.light-mode) .clock {
                     for (const key in data) {
                         const item = data[key];
                         if (item && item.name) {
-                            let customClass = '';
                             let nameText = item.name;
-                            const code = item.code || '';
-
-                            if (code === 'WRAINY' || nameText.includes('黃色暴雨')) {
-                                nameText = '黃色暴雨警告';
-                                customClass = 'badge-rain-yellow';
-                            } else if (code === 'WRAINR' || nameText.includes('紅色暴雨')) {
-                                nameText = '紅色暴雨警告';
-                                customClass = 'badge-rain-red';
-                            } else if (code === 'WRAINB' || nameText.includes('黑色暴雨')) {
-                                nameText = '黑色暴雨警告';
-                                customClass = 'badge-rain-black';
-                            } else if (code.startsWith('TC') || nameText.includes('熱帶氣旋')) {
-                                customClass = 'badge-typhoon';
-                                if (code === 'TC1' || nameText.includes('一號')) nameText = '1號戒備訊號';
-                                else if (code === 'TC3' || nameText.includes('三號')) nameText = '3號強風訊號';
-                                else if (code.includes('TC8') || nameText.includes('八號')) nameText = '8號烈風/暴風訊號';
-                                else if (code === 'TC9' || nameText.includes('九號')) nameText = '9號烈風/暴風增強訊號';
-                                else if (code === 'TC10' || nameText.includes('十號')) nameText = '10號颶風訊號';
-                            }
-
-                            warningHtml += `<span class="warning-badge ${customClass}">⚠️ ${nameText}</span>`;
+                            warningHtml += `<span class="warning-badge">⚠️ ${nameText}</span>`;
                         }
                     }
 
@@ -598,8 +654,6 @@ body:not(.light-mode) .clock {
                             const clockTime = `${String(nextTime.getHours()).padStart(2, '0')}:${String(nextTime.getMinutes()).padStart(2, '0')}`;
 
                             const rmkText = e.rmk_tc ? e.rmk_tc.trim() : '';
-                            
-                            // 特別車精準判斷邏輯
                             const specialKeywords = ['特別', '特快', '繞經', '不經', '由', '加開', '短途', '特別班次', '開出'];
                             const isRoutineText = (rmkText === '預定班次' || rmkText === '常規班次' || rmkText === '預定班次(常規)' || rmkText === '原定班次');
 
@@ -632,7 +686,7 @@ body:not(.light-mode) .clock {
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <span class="route-badge">${r.route}</span>
-                                    ${r.name ? `<span style="font-size: 1.25rem; font-weight: bold; color: var(--accent-blue);">${r.name}</span>` : ''}
+                                    ${r.name ? `<span style="font-size: 1.25rem; font-weight: bold; color: var(--text-main);">${r.name}</span>` : ''}
                                 </div>
                                 <button onclick="removeBusRoute(${i})" style="background:none; border:none; color:var(--accent-red); cursor:pointer; font-weight:bold; font-size: 1.3rem;">✕</button>
                             </div>
@@ -747,6 +801,7 @@ body:not(.light-mode) .clock {
             loadMemosFromCloud(); 
             fetchMTR();
             fetchBusETA();
+            triggerBoboSpeech(); // 初始化寶寶對話
         };
 
         setInterval(updateTime, 1000);
@@ -754,6 +809,7 @@ body:not(.light-mode) .clock {
         setInterval(fetchMTR, 15000);
         setInterval(fetchBusETA, 20000);
         setInterval(loadMemosFromCloud, 60000);
+        setInterval(() => triggerBoboSpeech(), 600000); // 每 10 分鐘隨機更換對話
     </script>
 </body>
 </html>
